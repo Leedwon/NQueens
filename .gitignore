@@ -1,0 +1,17 @@
+*.iml
+.idea/*
+!.idea/fileTemplates/
+!.idea/codeStyles/
+!.idea/icon.svg
+/captures
+
+# Gradle
+.gradle
+**/local.properties
+**/build
+
+# Kotlin
+.kotlin
+
+# OS
+.DS_Store
