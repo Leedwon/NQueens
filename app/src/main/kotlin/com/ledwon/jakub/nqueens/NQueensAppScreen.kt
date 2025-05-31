@@ -8,7 +8,7 @@ import com.ledwon.jakub.nqueens.features.mainmenu.MainMenuDestination
 import com.ledwon.jakub.nqueens.features.mainmenu.MainMenuScreen
 
 @Composable
-fun NQueensApp() {
+fun NQueensAppScreen() {
 
     val navController = rememberNavController()
 
