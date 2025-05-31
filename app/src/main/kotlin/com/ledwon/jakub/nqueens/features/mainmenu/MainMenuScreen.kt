@@ -124,13 +124,10 @@ private fun BoardSizeSlider(
 
 @Composable
 private fun BoardPreview(boardSize: Int) {
-    val animatedSize by animateDpAsState(
-        targetValue = ((boardSize / 20f) * 256).dp
-    )
+    val animatedSize by animateDpAsState(targetValue = CELL_SIZE * boardSize)
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ChessBoard(
             modifier = Modifier
@@ -139,7 +136,6 @@ private fun BoardPreview(boardSize: Int) {
             size = boardSize.toInt()
         )
         Text(
-            modifier = Modifier.padding(start = 16.dp),
             text = stringResource(R.string.board_size_template, boardSize),
             style = MaterialTheme.typography.bodyLarge
         )
@@ -164,6 +160,7 @@ private fun BottomBar(
 }
 
 private val AVAILABLE_BOARD_SIZES = 4f..20f
+private val CELL_SIZE = 16.dp
 
 @Preview
 @Composable
