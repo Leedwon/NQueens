@@ -82,12 +82,13 @@ data object BoardCellDefaults {
 
 @Composable
 fun ChessBoardScope.BoardCell(
+    modifier: Modifier = Modifier,
     colors: BoardCellColors = BoardCellDefaults.boardCellColors(),
     showLabels: Boolean = false,
     content: @Composable () -> Unit = {}
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(cellSize)
             .background(
                 if ((row + column) % 2 == 0) {
