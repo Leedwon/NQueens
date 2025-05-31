@@ -52,7 +52,7 @@ private fun MainMenuContent() {
 @Composable
 private fun TopBar() {
     TopAppBar(
-        title = { Text(stringResource(R.string.main_menu)) }
+        title = { Text(stringResource(R.string.n_queens)) }
     )
 }
 
