@@ -1,5 +1,6 @@
 package com.ledwon.jakub.nqueens.features.mainmenu
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.ledwon.jakub.nqueens.core.corutines.CoroutineRule
@@ -13,7 +14,8 @@ class MainMenuViewModelTest {
     @get:Rule
     private val coroutineRule = CoroutineRule()
 
-    private val viewModel = MainMenuViewModel()
+    private val savedStateHandle = SavedStateHandle()
+    private val viewModel = MainMenuViewModel(savedStateHandle)
 
     @Test
     fun `has correct initial state`() {
@@ -23,11 +25,19 @@ class MainMenuViewModelTest {
     }
 
     @Test
-    fun `changes board size`() {
-        val newSize = 10
-        viewModel.onBoardSizeChange(newSize)
-        val actual = viewModel.state.value.boardSize
-        assertThat(actual).isEqualTo(newSize)
+    fun `changes board size`() = runTest {
+        viewModel.state.test {
+            val initial = awaitItem()
+            assertThat(initial.boardSize).isEqualTo(8)
+
+            val newSize = 10
+            viewModel.onBoardSizeChange(newSize)
+
+            val updated = awaitItem()
+            assertThat(updated.boardSize).isEqualTo(newSize)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
