@@ -17,32 +17,58 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ledwon.jakub.nqueens.R
+import com.ledwon.jakub.nqueens.features.mainmenu.MainMenuViewModel.UiEffect.NavigateToGame
 import com.ledwon.jakub.nqueens.ui.components.ChessBoard
 import com.ledwon.jakub.nqueens.ui.theme.NQueensTheme
 
 @Composable
-fun MainMenuScreen() {
-    MainMenuContent()
+fun MainMenuScreen(
+    viewModel: MainMenuViewModel = hiltViewModel(),
+    navigateToGame: (boardSize: Int) -> Unit
+) {
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect {
+            when (it) {
+                is NavigateToGame -> navigateToGame(it.boardSize)
+            }
+        }
+    }
+
+    MainMenuContent(
+        state = state,
+        onBoardSizeChange = { viewModel.onBoardSizeChange(it) },
+        onPlayClick = { viewModel.onPlayClick() }
+    )
 }
 
 @Composable
-private fun MainMenuContent() {
+private fun MainMenuContent(
+    state: MainMenuState,
+    onBoardSizeChange: (Int) -> Unit,
+    onPlayClick: () -> Unit
+) {
     Scaffold(
         topBar = { TopBar() },
-        bottomBar = { BottomBar(onPlayClick = { TODO() }) }
+        bottomBar = { BottomBar(onPlayClick = onPlayClick) }
     ) {
         LazyColumn(modifier = Modifier.padding(it)) {
             item(key = "board_size_picker") {
                 BoardSizePicker(
-                    boardSize = 4,
-                    onBoardSizeChange = { TODO() }
+                    boardSize = state.boardSize,
+                    onBoardSizeChange = onBoardSizeChange
                 )
             }
         }
@@ -143,6 +169,10 @@ private val AVAILABLE_BOARD_SIZES = 4f..20f
 @Composable
 private fun MainMenuScreenPreview() {
     NQueensTheme {
-        MainMenuScreen()
+        MainMenuContent(
+            state = MainMenuState(boardSize = 8),
+            onBoardSizeChange = {},
+            onPlayClick = {}
+        )
     }
 }

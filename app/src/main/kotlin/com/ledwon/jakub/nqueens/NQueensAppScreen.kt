@@ -16,6 +16,12 @@ fun NQueensAppScreen() {
         navController = navController,
         startDestination = MainMenuDestination
     ) {
-        composable<MainMenuDestination> { MainMenuScreen() }
+        composable<MainMenuDestination> {
+            MainMenuScreen(
+                navigateToGame = {
+                    TODO()
+                }
+            )
+        }
     }
 }
