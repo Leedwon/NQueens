@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ledwon.jakub.nqueens.R
 import com.ledwon.jakub.nqueens.ui.components.ChessBoard
 import com.ledwon.jakub.nqueens.ui.theme.NQueensTheme
+import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 fun GameScreen(
@@ -75,7 +76,10 @@ private fun TopBar(
 private fun GameScreenPreview() {
     NQueensTheme {
         GameContent(
-            state = GameState(boardSize = 8),
+            state = GameState(
+                boardSize = 8,
+                cells = persistentMapOf()
+            ),
             onBackClick = {}
         )
     }

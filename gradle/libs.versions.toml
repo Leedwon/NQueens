@@ -13,7 +13,7 @@ androidx-navigation = "2.9.0"
 androidx-hilt = "1.2.0"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.8.1"
-
+kotlinx-collections-immutable = "0.3.8"
 
 hilt = "2.56.2"
 
@@ -40,6 +40,7 @@ androidx-hilt-navigation = { module = "androidx.hilt:hilt-navigation", version.r
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidx-hilt" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 
