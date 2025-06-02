@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.ledwon.jakub.nqueens.features.game.GameDestination
 import com.ledwon.jakub.nqueens.features.game.GameScreen
 import com.ledwon.jakub.nqueens.features.mainmenu.MainMenuDestination
@@ -22,7 +23,8 @@ fun NQueensAppScreen() {
             MainMenuScreen(navigateToGame = { navController.navigate(GameDestination(boardSize = it)) })
         }
         composable<GameDestination> {
-            GameScreen()
+            val boardSize = it.toRoute<GameDestination>().boardSize
+            GameScreen(boardSize = boardSize)
         }
     }
 }

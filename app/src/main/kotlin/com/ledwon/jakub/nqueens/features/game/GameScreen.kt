@@ -24,7 +24,10 @@ import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 fun GameScreen(
-    gameViewModel: GameViewModel = hiltViewModel()
+    boardSize: Int,
+    gameViewModel: GameViewModel = hiltViewModel<GameViewModel, GameViewModel.Factory> { factory ->
+        factory.create(boardSize = boardSize)
+    }
 ) {
     val state by gameViewModel.state.collectAsStateWithLifecycle()
 

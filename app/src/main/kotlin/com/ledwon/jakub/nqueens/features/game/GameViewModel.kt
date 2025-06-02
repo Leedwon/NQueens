@@ -1,22 +1,25 @@
 package com.ledwon.jakub.nqueens.features.game
 
 import androidx.compose.runtime.Stable
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.navigation.toRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
 
 @Stable
-@HiltViewModel
-class GameViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle
+@HiltViewModel(assistedFactory = GameViewModel.Factory::class)
+class GameViewModel @AssistedInject constructor(
+    @Assisted private val boardSize: Int
 ) : ViewModel() {
 
-    private val boardSize = savedStateHandle.toRoute<GameDestination>().boardSize
+    @AssistedFactory
+    interface Factory {
+        fun create(boardSize: Int): GameViewModel
+    }
 
     private val _state = MutableStateFlow(createInitialState())
     val state = _state.asStateFlow()
