@@ -1,25 +1,40 @@
 package com.ledwon.jakub.nqueens.features.game
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ledwon.jakub.nqueens.R
+import com.ledwon.jakub.nqueens.ui.components.BoardCell
+import com.ledwon.jakub.nqueens.ui.components.BoardCellColors
+import com.ledwon.jakub.nqueens.ui.components.BoardCellDefaults
 import com.ledwon.jakub.nqueens.ui.components.ChessBoard
+import com.ledwon.jakub.nqueens.ui.components.ChessBoardScope
 import com.ledwon.jakub.nqueens.ui.theme.NQueensTheme
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
@@ -36,6 +51,7 @@ fun GameScreen(
     }
     GameContent(
         state = state,
+        onCellClick = { gameViewModel.onCellClick(it) },
         onBackClick = { TODO() }
     )
 }
@@ -43,16 +59,17 @@ fun GameScreen(
 @Composable
 private fun GameContent(
     state: GameState,
+    onCellClick: (BoardPosition) -> Unit,
     onBackClick: () -> Unit
 ) {
     Scaffold(
         topBar = { TopBar(onBackClick = onBackClick) }
     ) {
-        ChessBoard(
+        Board(
+            modifier = Modifier.padding(it),
+            cells = state.cells,
             size = state.boardSize,
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize()
+            onCellClick = onCellClick,
         )
     }
 }
@@ -74,15 +91,104 @@ private fun TopBar(
     )
 }
 
+@Composable
+private fun Board(
+    size: Int,
+    cells: ImmutableMap<BoardPosition, Cell>,
+    onCellClick: (BoardPosition) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ChessBoard(
+        size = size,
+        modifier = modifier
+            .fillMaxSize(),
+        cell = {
+            val boardPosition = BoardPosition(row = row, column = column)
+            val cell = cells[boardPosition] ?: error("Cell not found for position: $boardPosition")
+            Cell(
+                cell = cell,
+                onClick = { onCellClick(boardPosition) }
+            )
+        }
+    )
+}
+
+@Composable
+private fun ChessBoardScope.Cell(
+    cell: Cell,
+    onClick: () -> Unit
+) {
+    BoardCell(
+        colors = getCellColors(cell),
+        modifier = Modifier.clickable(onClick = onClick),
+        showLabels = true
+    ) {
+        Queen(
+            visible = cell.hasQueen,
+            modifier = Modifier.size(cellSize / 2)
+        )
+    }
+}
+
+@Composable
+private fun Queen(
+    visible: Boolean,
+    modifier: Modifier = Modifier
+) {
+    AnimatedVisibility(
+        modifier = modifier,
+        visible = visible,
+        enter = fadeIn() + scaleIn(),
+        exit = fadeOut() + scaleOut()
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_queen),
+            contentDescription = null,
+        )
+    }
+
+}
+
+@Composable
+private fun getCellColors(cell: Cell): BoardCellColors {
+    val defaultColors = BoardCellDefaults.boardCellColors()
+    val whiteCellColor by animateColorAsState(if (cell.hasConflict) MaterialTheme.colorScheme.error else defaultColors.whiteCellColor)
+    val blackCellColor by animateColorAsState(if (cell.hasConflict) MaterialTheme.colorScheme.errorContainer else defaultColors.blackCellColor)
+
+    return BoardCellColors(
+        whiteCellColor = whiteCellColor,
+        blackCellColor = blackCellColor,
+    )
+}
+
 @Preview
 @Composable
 private fun GameScreenPreview() {
     NQueensTheme {
         GameContent(
             state = GameState(
-                boardSize = 8,
-                cells = persistentMapOf()
+                boardSize = 4, cells =
+                    persistentMapOf(
+                        BoardPosition(0, 0) to Cell(hasQueen = true, hasConflict = true),
+                        BoardPosition(0, 1) to Cell(hasQueen = true, hasConflict = true),
+                        BoardPosition(0, 2) to Cell(hasQueen = false, hasConflict = true),
+                        BoardPosition(0, 3) to Cell(hasQueen = false, hasConflict = true),
+                        BoardPosition(1, 0) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(1, 1) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(1, 2) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(1, 3) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(2, 0) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(2, 1) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(2, 2) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(2, 3) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(3, 0) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(3, 1) to Cell(hasQueen = false, hasConflict = false),
+                        BoardPosition(3, 2) to Cell(hasQueen = true, hasConflict = false),
+                        BoardPosition(3, 3) to Cell(hasQueen = false, hasConflict = false),
+                    )
+
             ),
+            onCellClick = {},
             onBackClick = {}
         )
     }
