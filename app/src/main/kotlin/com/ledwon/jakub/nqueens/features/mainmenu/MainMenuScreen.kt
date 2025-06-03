@@ -159,7 +159,7 @@ private fun BottomBar(
     }
 }
 
-private val AVAILABLE_BOARD_SIZES = 4f..20f
+private val AVAILABLE_BOARD_SIZES = 4f..12f
 private val CELL_SIZE = 16.dp
 
 @Preview
