@@ -36,6 +36,10 @@ class GameViewModel @AssistedInject constructor(
             cells = createCells(
                 queens = it.queens,
                 conflicts = it.conflicts
+            ),
+            queensMetadata = createQueensMetadata(
+                queens = it.queens,
+                conflicts = it.conflicts
             )
         )
     }.stateIn(
@@ -66,6 +70,19 @@ class GameViewModel @AssistedInject constructor(
             .toPersistentMap()
     }
 
+    private fun createQueensMetadata(
+        queens: Set<CoreBoardPosition>,
+        conflicts: Conflicts
+    ): QueensMetadata {
+        val correctlyPlaced = queens.count { it !in conflicts }
+        val conflicting = queens.size - correctlyPlaced
+        return QueensMetadata(
+            goal = boardSize,
+            correctlyPlaced = correctlyPlaced,
+            conflicting = conflicting
+        )
+    }
+
     private fun createInitialState(): GameState {
         return GameState(
             boardSize = boardSize,
@@ -77,6 +94,11 @@ class GameViewModel @AssistedInject constructor(
                     majorDiagonals = emptySet(),
                     minorDiagonals = emptySet()
                 )
+            ),
+            queensMetadata = QueensMetadata(
+                goal = boardSize,
+                correctlyPlaced = 0,
+                conflicting = 0
             )
         )
     }

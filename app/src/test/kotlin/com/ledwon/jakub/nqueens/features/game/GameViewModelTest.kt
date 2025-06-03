@@ -25,7 +25,12 @@ class GameViewModelTest {
     fun `has correct initial state`() {
         val expectedState = GameState(
             boardSize = boardSize,
-            cells = emptyCells().toPersistentMap()
+            cells = emptyCells().toPersistentMap(),
+            queensMetadata = QueensMetadata(
+                goal = boardSize,
+                correctlyPlaced = 0,
+                conflicting = 0
+            )
         )
 
         assertThat(viewModel.state.value).isEqualTo(expectedState)
@@ -185,6 +190,30 @@ class GameViewModelTest {
             assertThat(awaitItem().cells).isEqualTo(expectedCells)
 
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `creates queens metadata`() = runTest{
+        viewModel.state.test {
+            awaitItem() // Initial state
+
+            val positions = listOf(
+                BoardPosition(0, 1),
+                BoardPosition(1, 2),
+                BoardPosition(2, 0),
+                BoardPosition(3, 2)
+            )
+
+            positions.forEach { viewModel.onCellClick(it) }
+
+            val expected = QueensMetadata(
+                goal = boardSize,
+                correctlyPlaced = 1,
+                conflicting = 3
+            )
+
+            assertThat(awaitItem().queensMetadata).isEqualTo(expected)
         }
     }
 

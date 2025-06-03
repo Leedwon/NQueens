@@ -9,40 +9,61 @@ class GameStatePreviewParameterProvider : PreviewParameterProvider<GameState> {
     override val values: Sequence<GameState> = sequenceOf(
         GameState(
             boardSize = 4,
-            cells = fullBoard(4, emptyMap())
-        ),
-
-        GameState(
-            boardSize = 4,
-            cells = fullBoard(
-                4, mapOf(
-                    BoardPosition(1, 1) to Cell(hasQueen = true, hasConflict = false)
-                )
+            cells = fullBoard(4, emptyMap()),
+            queensMetadata = QueensMetadata(
+                goal = 4,
+                correctlyPlaced = 0,
+                conflicting = 0
             )
         ),
 
         GameState(
             boardSize = 4,
             cells = fullBoard(
-                4, mapOf(
+                boardSize = 4,
+                overrides = mapOf(BoardPosition(1, 1) to Cell(hasQueen = true, hasConflict = false))
+            ),
+            queensMetadata = QueensMetadata(
+                goal = 4,
+                correctlyPlaced = 1,
+                conflicting = 0
+            )
+        ),
+
+        GameState(
+            boardSize = 4,
+            cells = fullBoard(
+                boardSize = 4,
+                overrides = mapOf(
                     BoardPosition(0, 0) to Cell(hasQueen = true, hasConflict = true),
                     BoardPosition(0, 1) to Cell(hasQueen = true, hasConflict = true),
                     BoardPosition(0, 2) to Cell(hasQueen = false, hasConflict = true),
                     BoardPosition(0, 3) to Cell(hasQueen = false, hasConflict = true),
                     BoardPosition(3, 2) to Cell(hasQueen = true, hasConflict = false),
                 )
+            ),
+            queensMetadata = QueensMetadata(
+                goal = 4,
+                correctlyPlaced = 1,
+                conflicting = 2
             )
         ),
 
         GameState(
             boardSize = 4,
             cells = fullBoard(
-                4, mapOf(
+                boardSize = 4,
+                overrides = mapOf(
                     BoardPosition(0, 1) to Cell(hasQueen = true, hasConflict = false),
                     BoardPosition(1, 3) to Cell(hasQueen = true, hasConflict = false),
                     BoardPosition(2, 0) to Cell(hasQueen = true, hasConflict = false),
                     BoardPosition(3, 2) to Cell(hasQueen = true, hasConflict = false),
                 )
+            ),
+            queensMetadata = QueensMetadata(
+                goal = 4,
+                correctlyPlaced = 4,
+                conflicting = 0
             )
         )
     )

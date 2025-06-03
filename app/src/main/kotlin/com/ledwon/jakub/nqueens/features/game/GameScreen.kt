@@ -8,7 +8,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -21,11 +24,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ledwon.jakub.nqueens.R
@@ -65,12 +70,20 @@ private fun GameContent(
     Scaffold(
         topBar = { TopBar(onBackClick = onBackClick) }
     ) {
-        Board(
+        Column(
             modifier = Modifier.padding(it),
-            cells = state.cells,
-            size = state.boardSize,
-            onCellClick = onCellClick,
-        )
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            QueensInfo(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                queensMetadata = state.queensMetadata
+            )
+            Board(
+                cells = state.cells,
+                size = state.boardSize,
+                onCellClick = onCellClick,
+            )
+        }
     }
 }
 
@@ -100,8 +113,7 @@ private fun Board(
 ) {
     ChessBoard(
         size = size,
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier,
         cell = {
             val boardPosition = BoardPosition(row = row, column = column)
             val cell = cells[boardPosition] ?: error("Cell not found for position: $boardPosition")
@@ -145,6 +157,37 @@ private fun Queen(
             painter = painterResource(R.drawable.ic_queen),
             contentDescription = null,
         )
+    }
+
+}
+
+@Composable
+private fun QueensInfo(
+    queensMetadata: QueensMetadata,
+    modifier: Modifier = Modifier
+) {
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(
+            space = 4.dp,
+            alignment = Alignment.CenterHorizontally
+        )
+    ) {
+        repeat(queensMetadata.goal) { index ->
+            val color by animateColorAsState(
+                when {
+                    index < queensMetadata.correctlyPlaced -> MaterialTheme.colorScheme.primary
+                    index < queensMetadata.correctlyPlaced + queensMetadata.conflicting -> MaterialTheme.colorScheme.error
+                    else -> MaterialTheme.colorScheme.surfaceVariant
+                }
+            )
+            Icon(
+                modifier = Modifier.size(32.dp),
+                painter = painterResource(R.drawable.ic_queen),
+                contentDescription = null,
+                tint = color
+            )
+        }
     }
 
 }

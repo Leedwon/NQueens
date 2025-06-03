@@ -4,7 +4,8 @@ import kotlinx.collections.immutable.ImmutableMap
 
 data class GameState(
     val boardSize: Int,
-    val cells: ImmutableMap<BoardPosition, Cell>
+    val cells: ImmutableMap<BoardPosition, Cell>,
+    val queensMetadata: QueensMetadata
 )
 
 data class BoardPosition(
@@ -15,4 +16,10 @@ data class BoardPosition(
 data class Cell(
     val hasQueen: Boolean,
     val hasConflict: Boolean
+)
+
+data class QueensMetadata(
+    val goal: Int,
+    val correctlyPlaced: Int,
+    val conflicting: Int
 )
