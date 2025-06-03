@@ -14,6 +14,8 @@ class CoroutineRule(
     val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
 ) : TestWatcher() {
 
+    val testDispatchers: CoroutineDispatchers = TestCoroutineDispatchers(testDispatcher)
+
     override fun starting(description: Description) {
         super.starting(description)
         Dispatchers.setMain(testDispatcher)
