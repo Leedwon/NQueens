@@ -185,7 +185,8 @@ private fun QueensInfo(
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(space = 4.dp)
+        horizontalArrangement = Arrangement.spacedBy(space = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(space = 4.dp)
     ) {
         repeat(queensMetadata.goal) { index ->
             val color by animateColorAsState(
