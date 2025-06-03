@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ledwon.jakub.nqueens.R
@@ -35,7 +36,6 @@ import com.ledwon.jakub.nqueens.ui.components.ChessBoard
 import com.ledwon.jakub.nqueens.ui.components.ChessBoardScope
 import com.ledwon.jakub.nqueens.ui.theme.NQueensTheme
 import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 fun GameScreen(
@@ -163,31 +163,12 @@ private fun getCellColors(cell: Cell): BoardCellColors {
 
 @Preview
 @Composable
-private fun GameScreenPreview() {
+private fun GameScreenPreview(
+    @PreviewParameter(GameStatePreviewParameterProvider::class) state: GameState
+) {
     NQueensTheme {
         GameContent(
-            state = GameState(
-                boardSize = 4, cells =
-                    persistentMapOf(
-                        BoardPosition(0, 0) to Cell(hasQueen = true, hasConflict = true),
-                        BoardPosition(0, 1) to Cell(hasQueen = true, hasConflict = true),
-                        BoardPosition(0, 2) to Cell(hasQueen = false, hasConflict = true),
-                        BoardPosition(0, 3) to Cell(hasQueen = false, hasConflict = true),
-                        BoardPosition(1, 0) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(1, 1) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(1, 2) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(1, 3) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(2, 0) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(2, 1) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(2, 2) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(2, 3) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(3, 0) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(3, 1) to Cell(hasQueen = false, hasConflict = false),
-                        BoardPosition(3, 2) to Cell(hasQueen = true, hasConflict = false),
-                        BoardPosition(3, 3) to Cell(hasQueen = false, hasConflict = false),
-                    )
-
-            ),
+            state = state,
             onCellClick = {},
             onBackClick = {}
         )
