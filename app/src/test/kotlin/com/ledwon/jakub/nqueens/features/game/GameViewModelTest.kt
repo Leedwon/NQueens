@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.ledwon.jakub.nqueens.core.corutines.CoroutineRule
 import com.ledwon.jakub.nqueens.core.game.GameEngine
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
+import com.ledwon.jakub.nqueens.core.stopwatch.FakeStopwatch
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -24,9 +25,13 @@ class GameViewModelTest {
             return GameEngine(boardSize = boardSize)
         }
     }
+
+    private val stopwatch = FakeStopwatch()
+
     private val viewModel = GameViewModel(
         boardSize = boardSize,
         gameEngineFactory = gameEngineFactory,
+        stopwatch = stopwatch,
         dispatchers = coroutineRule.testDispatchers
     )
 
@@ -277,12 +282,28 @@ class GameViewModelTest {
     }
 
     @Test
+    fun `updates elapsed time`() = runTest(testDispatcher) {
+        viewModel.state.test {
+            awaitItem() // Initial state
+
+            stopwatch.valueFlow.value = 5000L
+            assertThat(awaitItem().elapsedMillis).isEqualTo(5000L)
+
+            stopwatch.valueFlow.value = 10000L
+            assertThat(awaitItem().elapsedMillis).isEqualTo(10000L)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `restarts game`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 
             val position = BoardPosition(row = 0, column = 0)
             viewModel.onCellClick(position)
+            stopwatch.valueFlow.value = 1000L
 
             val mutatedGameState = GameState(
                 boardSize = boardSize,
@@ -294,12 +315,13 @@ class GameViewModelTest {
                     correctlyPlaced = 1,
                     conflicting = 0
                 ),
-                elapsedMillis = 0
+                elapsedMillis = 1000L
             )
 
             assertThat(awaitItem()).isEqualTo(mutatedGameState)
 
             viewModel.onRestartClick()
+            stopwatch.valueFlow.value = 0L
 
             val initialGameState = GameState(
                 boardSize = boardSize,

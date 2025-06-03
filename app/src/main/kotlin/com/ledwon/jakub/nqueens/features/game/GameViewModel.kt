@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ledwon.jakub.nqueens.core.corutines.CoroutineDispatchers
 import com.ledwon.jakub.nqueens.core.game.Conflicts
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
+import com.ledwon.jakub.nqueens.core.stopwatch.Stopwatch
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -15,8 +16,8 @@ import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.ledwon.jakub.nqueens.core.game.BoardPosition as CoreBoardPosition
 import com.ledwon.jakub.nqueens.core.game.GameState as CoreGameState
@@ -26,6 +27,7 @@ import com.ledwon.jakub.nqueens.core.game.GameState as CoreGameState
 class GameViewModel @AssistedInject constructor(
     @Assisted private val boardSize: Int,
     private val gameEngineFactory: GameEngineFactory,
+    private val stopwatch: Stopwatch,
     private val dispatchers: CoroutineDispatchers
 ) : ViewModel() {
 
@@ -38,10 +40,10 @@ class GameViewModel @AssistedInject constructor(
     val state = _state.asStateFlow()
 
     private var gameEngine = gameEngineFactory.create(boardSize = boardSize)
-    private var gameEngineSubscription: Job? = null
+    private var gameSubscription: Job? = null
 
     init {
-        observeGameEngine()
+        observeGameFlow()
     }
 
     fun onCellClick(position: BoardPosition) {
@@ -49,21 +51,25 @@ class GameViewModel @AssistedInject constructor(
     }
 
     fun onRestartClick() {
-        gameEngineSubscription?.cancel()
+        gameSubscription?.cancel()
         gameEngine = gameEngineFactory.create(boardSize = boardSize)
-        observeGameEngine()
+        observeGameFlow()
     }
 
-    private fun observeGameEngine() {
-        gameEngineSubscription = viewModelScope.launch {
-            gameEngine.state
-                .map { createState(it) }
+    private fun observeGameFlow() {
+        gameSubscription = viewModelScope.launch {
+            combine(
+                gameEngine.state,
+                stopwatch.start()
+            ) { gameState, elapsedMillis ->
+                createState(gameState = gameState, elapsedMillis = elapsedMillis)
+            }
                 .flowOn(dispatchers.default)
                 .collect { _state.value = it }
         }
     }
 
-    private fun createState(gameState: CoreGameState): GameState {
+    private fun createState(gameState: CoreGameState, elapsedMillis: Long): GameState {
         return GameState(
             boardSize = boardSize,
             cells = createCells(
@@ -74,7 +80,7 @@ class GameViewModel @AssistedInject constructor(
                 queens = gameState.queens,
                 conflicts = gameState.conflicts
             ),
-            elapsedMillis = 0
+            elapsedMillis = elapsedMillis
         )
     }
 
