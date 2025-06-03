@@ -11,16 +11,18 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toPersistentMap
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import com.ledwon.jakub.nqueens.core.game.BoardPosition as CoreBoardPosition
+import com.ledwon.jakub.nqueens.core.game.GameState as CoreGameState
 
 @Stable
 @HiltViewModel(assistedFactory = GameViewModel.Factory::class)
 class GameViewModel @AssistedInject constructor(
     @Assisted private val boardSize: Int,
-    gameEngineFactory: GameEngineFactory
+    private val gameEngineFactory: GameEngineFactory
 ) : ViewModel() {
 
     @AssistedFactory
@@ -28,28 +30,46 @@ class GameViewModel @AssistedInject constructor(
         fun create(boardSize: Int): GameViewModel
     }
 
-    private val gameEngine = gameEngineFactory.create(boardSize = boardSize)
+    private val _state = MutableStateFlow(createInitialState())
+    val state = _state.asStateFlow()
 
-    val state = gameEngine.state.map {
-        GameState(
-            boardSize = boardSize,
-            cells = createCells(
-                queens = it.queens,
-                conflicts = it.conflicts
-            ),
-            queensMetadata = createQueensMetadata(
-                queens = it.queens,
-                conflicts = it.conflicts
-            )
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = createInitialState()
-    )
+    private var gameEngine = gameEngineFactory.create(boardSize = boardSize)
+    private var gameEngineSubscription: Job? = null
+
+    init {
+        observeGameEngine()
+    }
 
     fun onCellClick(position: BoardPosition) {
         gameEngine.toggleQueen(position = position.toCorePosition())
+    }
+
+    fun onRestartClick() {
+        gameEngineSubscription?.cancel()
+        gameEngine = gameEngineFactory.create(boardSize = boardSize)
+        observeGameEngine()
+    }
+
+    private fun observeGameEngine() {
+        gameEngineSubscription = viewModelScope.launch {
+            gameEngine.state.collect {
+                _state.value = createState(it)
+            }
+        }
+    }
+
+    private fun createState(gameState: CoreGameState): GameState {
+        return GameState(
+            boardSize = boardSize,
+            cells = createCells(
+                queens = gameState.queens,
+                conflicts = gameState.conflicts
+            ),
+            queensMetadata = createQueensMetadata(
+                queens = gameState.queens,
+                conflicts = gameState.conflicts
+            )
+        )
     }
 
     private fun createCells(

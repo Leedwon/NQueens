@@ -3,6 +3,9 @@ package com.ledwon.jakub.nqueens.features.game
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -11,11 +14,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,8 +29,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +49,7 @@ import com.ledwon.jakub.nqueens.ui.components.ChessBoard
 import com.ledwon.jakub.nqueens.ui.components.ChessBoardScope
 import com.ledwon.jakub.nqueens.ui.theme.NQueensTheme
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.coroutines.launch
 
 @Composable
 fun GameScreen(
@@ -57,6 +66,7 @@ fun GameScreen(
     GameContent(
         state = state,
         onCellClick = { gameViewModel.onCellClick(it) },
+        onRestartClick = { gameViewModel.onRestartClick() },
         onBackClick = { TODO() }
     )
 }
@@ -65,6 +75,7 @@ fun GameScreen(
 private fun GameContent(
     state: GameState,
     onCellClick: (BoardPosition) -> Unit,
+    onRestartClick: () -> Unit = {},
     onBackClick: () -> Unit
 ) {
     Scaffold(
@@ -74,10 +85,16 @@ private fun GameContent(
             modifier = Modifier.padding(it),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            QueensInfo(
+            Row(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                queensMetadata = state.queensMetadata
-            )
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                QueensInfo(
+                    modifier = Modifier.weight(1f),
+                    queensMetadata = state.queensMetadata
+                )
+                RestartButton(onClick = onRestartClick)
+            }
             Board(
                 cells = state.cells,
                 size = state.boardSize,
@@ -168,10 +185,7 @@ private fun QueensInfo(
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(
-            space = 4.dp,
-            alignment = Alignment.CenterHorizontally
-        )
+        horizontalArrangement = Arrangement.spacedBy(space = 4.dp)
     ) {
         repeat(queensMetadata.goal) { index ->
             val color by animateColorAsState(
@@ -189,7 +203,35 @@ private fun QueensInfo(
             )
         }
     }
+}
 
+@Composable
+private fun RestartButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val rotation = remember { Animatable(0f) }
+    val coroutineScope = rememberCoroutineScope()
+
+    IconButton(
+        modifier = modifier,
+        onClick = {
+            onClick()
+            coroutineScope.launch {
+                rotation.snapTo(0f)
+                rotation.animateTo(
+                    targetValue = 360f,
+                    animationSpec = tween(durationMillis = 500, easing = LinearEasing)
+                )
+            }
+        }
+    ) {
+        Icon(
+            modifier = Modifier.rotate(rotation.value),
+            imageVector = Icons.Default.Refresh,
+            contentDescription = null
+        )
+    }
 }
 
 @Composable

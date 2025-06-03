@@ -85,10 +85,22 @@ class GameViewModelTest {
 
             val expectedCells = emptyCells()
                 .apply {
-                    set(BoardPosition(row = 0, column = 0), Cell(hasQueen = true, hasConflict = true))
-                    set(BoardPosition(row = 0, column = 1), Cell(hasQueen = true, hasConflict = true))
-                    set(BoardPosition(row = 0, column = 2), Cell(hasQueen = false, hasConflict = true))
-                    set(BoardPosition(row = 0, column = 3), Cell(hasQueen = false, hasConflict = true))
+                    set(
+                        BoardPosition(row = 0, column = 0),
+                        Cell(hasQueen = true, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 0, column = 1),
+                        Cell(hasQueen = true, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 0, column = 2),
+                        Cell(hasQueen = false, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 0, column = 3),
+                        Cell(hasQueen = false, hasConflict = true)
+                    )
                 }
                 .toPersistentMap()
 
@@ -108,10 +120,22 @@ class GameViewModelTest {
 
             val expectedCells = emptyCells()
                 .apply {
-                    set(BoardPosition(row = 0, column = 0), Cell(hasQueen = true, hasConflict = true))
-                    set(BoardPosition(row = 1, column = 0), Cell(hasQueen = true, hasConflict = true))
-                    set(BoardPosition(row = 2, column = 0), Cell(hasQueen = false, hasConflict = true))
-                    set(BoardPosition(row = 3, column = 0), Cell(hasQueen = false, hasConflict = true))
+                    set(
+                        BoardPosition(row = 0, column = 0),
+                        Cell(hasQueen = true, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 1, column = 0),
+                        Cell(hasQueen = true, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 2, column = 0),
+                        Cell(hasQueen = false, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 3, column = 0),
+                        Cell(hasQueen = false, hasConflict = true)
+                    )
                 }
                 .toPersistentMap()
 
@@ -131,10 +155,22 @@ class GameViewModelTest {
 
             val expectedCells = emptyCells()
                 .apply {
-                    set(BoardPosition(row = 0, column = 0), Cell(hasQueen = true, hasConflict = true))
-                    set(BoardPosition(row = 1, column = 1), Cell(hasQueen = true, hasConflict = true))
-                    set(BoardPosition(row = 2, column = 2), Cell(hasQueen = false, hasConflict = true))
-                    set(BoardPosition(row = 3, column = 3), Cell(hasQueen = false, hasConflict = true))
+                    set(
+                        BoardPosition(row = 0, column = 0),
+                        Cell(hasQueen = true, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 1, column = 1),
+                        Cell(hasQueen = true, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 2, column = 2),
+                        Cell(hasQueen = false, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 3, column = 3),
+                        Cell(hasQueen = false, hasConflict = true)
+                    )
                 }
                 .toPersistentMap()
 
@@ -154,10 +190,22 @@ class GameViewModelTest {
 
             val expectedCells = emptyCells()
                 .apply {
-                    set(BoardPosition(row = 0, column = 3), Cell(hasQueen = true, hasConflict = true))
-                    set(BoardPosition(row = 1, column = 2), Cell(hasQueen = true, hasConflict = true))
-                    set(BoardPosition(row = 2, column = 1), Cell(hasQueen = false, hasConflict = true))
-                    set(BoardPosition(row = 3, column = 0), Cell(hasQueen = false, hasConflict = true))
+                    set(
+                        BoardPosition(row = 0, column = 3),
+                        Cell(hasQueen = true, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 1, column = 2),
+                        Cell(hasQueen = true, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 2, column = 1),
+                        Cell(hasQueen = false, hasConflict = true)
+                    )
+                    set(
+                        BoardPosition(row = 3, column = 0),
+                        Cell(hasQueen = false, hasConflict = true)
+                    )
                 }
                 .toPersistentMap()
 
@@ -194,7 +242,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `creates queens metadata`() = runTest{
+    fun `creates queens metadata`() = runTest {
         viewModel.state.test {
             awaitItem() // Initial state
 
@@ -214,6 +262,45 @@ class GameViewModelTest {
             )
 
             assertThat(awaitItem().queensMetadata).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `restarts game`() = runTest {
+        viewModel.state.test {
+            awaitItem() // Initial state
+
+            val position = BoardPosition(row = 0, column = 0)
+            viewModel.onCellClick(position)
+
+            val mutatedGameState = GameState(
+                boardSize = boardSize,
+                cells = emptyCells()
+                    .apply { set(position, Cell(hasQueen = true, hasConflict = false)) }
+                    .toPersistentMap(),
+                queensMetadata = QueensMetadata(
+                    goal = boardSize,
+                    correctlyPlaced = 1,
+                    conflicting = 0
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(mutatedGameState)
+
+            viewModel.onRestartClick()
+
+            val initialGameState = GameState(
+                boardSize = boardSize,
+                cells = emptyCells().toPersistentMap(),
+                queensMetadata = QueensMetadata(
+                    goal = boardSize,
+                    correctlyPlaced = 0,
+                    conflicting = 0
+                )
+            )
+            assertThat(awaitItem()).isEqualTo(initialGameState)
+
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
