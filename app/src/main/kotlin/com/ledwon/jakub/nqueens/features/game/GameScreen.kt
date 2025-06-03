@@ -10,8 +10,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -28,12 +30,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -93,6 +97,7 @@ private fun GameContent(
                     modifier = Modifier.weight(1f),
                     queensMetadata = state.queensMetadata
                 )
+                ElapsedTime(millis = state.elapsedMillis)
                 RestartButton(onClick = onRestartClick)
             }
             Board(
@@ -207,6 +212,23 @@ private fun QueensInfo(
 }
 
 @Composable
+private fun ElapsedTime(millis: Long) {
+    Box(
+        Modifier.border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary,
+            shape = MaterialTheme.shapes.medium
+        )
+    ) {
+        Text(
+            modifier = Modifier.padding(4.dp),
+            text = formatMillis(millis),
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+@Composable
 private fun RestartButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -244,6 +266,21 @@ private fun getCellColors(cell: Cell): BoardCellColors {
     return BoardCellColors(
         whiteCellColor = whiteCellColor,
         blackCellColor = blackCellColor,
+    )
+}
+
+@ReadOnlyComposable
+@Composable
+private fun formatMillis(millis: Long): String {
+    val minutes = (millis / 1000) / 60
+    val seconds = (millis / 1000) % 60
+    val ms = millis % 1000
+    return String.format(
+        LocalConfiguration.current.locales[0],
+        "%02d:%02d.%03d",
+        minutes,
+        seconds,
+        ms
     )
 }
 

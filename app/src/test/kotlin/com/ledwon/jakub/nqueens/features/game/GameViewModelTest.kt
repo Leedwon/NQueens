@@ -7,7 +7,6 @@ import com.ledwon.jakub.nqueens.core.game.GameEngine
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import kotlin.test.Test
@@ -15,6 +14,7 @@ import kotlin.test.Test
 class GameViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
+
     @get:Rule
     private val coroutineRule = CoroutineRule(testDispatcher)
 
@@ -39,7 +39,8 @@ class GameViewModelTest {
                 goal = boardSize,
                 correctlyPlaced = 0,
                 conflicting = 0
-            )
+            ),
+            elapsedMillis = 0
         )
 
         assertThat(viewModel.state.value).isEqualTo(expectedState)
@@ -225,30 +226,31 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `creates cells with no conflicts when queens are placed correctly`() = runTest(testDispatcher) {
-        viewModel.state.test {
-            awaitItem() // Initial state
+    fun `creates cells with no conflicts when queens are placed correctly`() =
+        runTest(testDispatcher) {
+            viewModel.state.test {
+                awaitItem() // Initial state
 
-            val positions = listOf(
-                BoardPosition(0, 1),
-                BoardPosition(1, 3),
-                BoardPosition(2, 0),
-                BoardPosition(3, 2)
-            )
+                val positions = listOf(
+                    BoardPosition(0, 1),
+                    BoardPosition(1, 3),
+                    BoardPosition(2, 0),
+                    BoardPosition(3, 2)
+                )
 
-            positions.forEach { viewModel.onCellClick(it) }
+                positions.forEach { viewModel.onCellClick(it) }
 
-            val expectedCells = emptyCells()
-                .apply {
-                    positions.forEach { set(it, Cell(hasQueen = true, hasConflict = false)) }
-                }
-                .toPersistentMap()
+                val expectedCells = emptyCells()
+                    .apply {
+                        positions.forEach { set(it, Cell(hasQueen = true, hasConflict = false)) }
+                    }
+                    .toPersistentMap()
 
-            assertThat(awaitItem().cells).isEqualTo(expectedCells)
+                assertThat(awaitItem().cells).isEqualTo(expectedCells)
 
-            cancelAndIgnoreRemainingEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
     fun `creates queens metadata`() = runTest(testDispatcher) {
@@ -291,7 +293,8 @@ class GameViewModelTest {
                     goal = boardSize,
                     correctlyPlaced = 1,
                     conflicting = 0
-                )
+                ),
+                elapsedMillis = 0
             )
 
             assertThat(awaitItem()).isEqualTo(mutatedGameState)
@@ -305,7 +308,8 @@ class GameViewModelTest {
                     goal = boardSize,
                     correctlyPlaced = 0,
                     conflicting = 0
-                )
+                ),
+                elapsedMillis = 0
             )
             assertThat(awaitItem()).isEqualTo(initialGameState)
 

@@ -14,7 +14,8 @@ class GameStatePreviewParameterProvider : PreviewParameterProvider<GameState> {
                 goal = 4,
                 correctlyPlaced = 0,
                 conflicting = 0
-            )
+            ),
+            elapsedMillis = 0
         ),
 
         GameState(
@@ -27,7 +28,8 @@ class GameStatePreviewParameterProvider : PreviewParameterProvider<GameState> {
                 goal = 4,
                 correctlyPlaced = 1,
                 conflicting = 0
-            )
+            ),
+            elapsedMillis = 3200
         ),
 
         GameState(
@@ -46,7 +48,8 @@ class GameStatePreviewParameterProvider : PreviewParameterProvider<GameState> {
                 goal = 4,
                 correctlyPlaced = 1,
                 conflicting = 2
-            )
+            ),
+            elapsedMillis = 30_123
         ),
 
         GameState(
@@ -64,7 +67,8 @@ class GameStatePreviewParameterProvider : PreviewParameterProvider<GameState> {
                 goal = 4,
                 correctlyPlaced = 4,
                 conflicting = 0
-            )
+            ),
+            elapsedMillis = 55_123
         )
     )
 }

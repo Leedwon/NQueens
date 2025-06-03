@@ -73,7 +73,8 @@ class GameViewModel @AssistedInject constructor(
             queensMetadata = createQueensMetadata(
                 queens = gameState.queens,
                 conflicts = gameState.conflicts
-            )
+            ),
+            elapsedMillis = 0
         )
     }
 
@@ -124,7 +125,8 @@ class GameViewModel @AssistedInject constructor(
                 goal = boardSize,
                 correctlyPlaced = 0,
                 conflicting = 0
-            )
+            ),
+            elapsedMillis = 0
         )
     }
 
