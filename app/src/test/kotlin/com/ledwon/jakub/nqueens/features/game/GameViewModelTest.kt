@@ -2,13 +2,21 @@ package com.ledwon.jakub.nqueens.features.game
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.ledwon.jakub.nqueens.core.corutines.CoroutineRule
 import com.ledwon.jakub.nqueens.core.game.GameEngine
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
 import kotlinx.collections.immutable.toPersistentMap
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import org.junit.Rule
 import kotlin.test.Test
 
 class GameViewModelTest {
+
+    private val testDispatcher = StandardTestDispatcher()
+    @get:Rule
+    private val coroutineRule = CoroutineRule(testDispatcher)
 
     private val boardSize = 4
     private val gameEngineFactory = object : GameEngineFactory {
@@ -18,7 +26,8 @@ class GameViewModelTest {
     }
     private val viewModel = GameViewModel(
         boardSize = boardSize,
-        gameEngineFactory = gameEngineFactory
+        gameEngineFactory = gameEngineFactory,
+        dispatchers = coroutineRule.testDispatchers
     )
 
     @Test
@@ -37,7 +46,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `adds queen on cell click`() = runTest {
+    fun `adds queen on cell click`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 
@@ -55,7 +64,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `removes queen on cell click when already present`() = runTest {
+    fun `removes queen on cell click when already present`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 
@@ -76,7 +85,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `creates cells with row conflict`() = runTest {
+    fun `creates cells with row conflict`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 
@@ -111,7 +120,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `creates cells with column conflict`() = runTest {
+    fun `creates cells with column conflict`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 
@@ -146,7 +155,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `creates cells with major diagonal conflict`() = runTest {
+    fun `creates cells with major diagonal conflict`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 
@@ -181,7 +190,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `creates cells with minor diagonal conflict`() = runTest {
+    fun `creates cells with minor diagonal conflict`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 
@@ -216,7 +225,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `creates cells with no conflicts when queens are placed correctly`() = runTest {
+    fun `creates cells with no conflicts when queens are placed correctly`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 
@@ -242,7 +251,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `creates queens metadata`() = runTest {
+    fun `creates queens metadata`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 
@@ -266,7 +275,7 @@ class GameViewModelTest {
     }
 
     @Test
-    fun `restarts game`() = runTest {
+    fun `restarts game`() = runTest(testDispatcher) {
         viewModel.state.test {
             awaitItem() // Initial state
 

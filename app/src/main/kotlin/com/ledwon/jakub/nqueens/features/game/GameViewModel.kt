@@ -3,6 +3,7 @@ package com.ledwon.jakub.nqueens.features.game
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ledwon.jakub.nqueens.core.corutines.CoroutineDispatchers
 import com.ledwon.jakub.nqueens.core.game.Conflicts
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
 import dagger.assisted.Assisted
@@ -14,6 +15,8 @@ import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.ledwon.jakub.nqueens.core.game.BoardPosition as CoreBoardPosition
 import com.ledwon.jakub.nqueens.core.game.GameState as CoreGameState
@@ -22,7 +25,8 @@ import com.ledwon.jakub.nqueens.core.game.GameState as CoreGameState
 @HiltViewModel(assistedFactory = GameViewModel.Factory::class)
 class GameViewModel @AssistedInject constructor(
     @Assisted private val boardSize: Int,
-    private val gameEngineFactory: GameEngineFactory
+    private val gameEngineFactory: GameEngineFactory,
+    private val dispatchers: CoroutineDispatchers
 ) : ViewModel() {
 
     @AssistedFactory
@@ -52,9 +56,10 @@ class GameViewModel @AssistedInject constructor(
 
     private fun observeGameEngine() {
         gameEngineSubscription = viewModelScope.launch {
-            gameEngine.state.collect {
-                _state.value = createState(it)
-            }
+            gameEngine.state
+                .map { createState(it) }
+                .flowOn(dispatchers.default)
+                .collect { _state.value = it }
         }
     }
 
