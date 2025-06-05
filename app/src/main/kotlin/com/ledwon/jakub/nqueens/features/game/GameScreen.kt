@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun GameScreen(
     boardSize: Int,
-    navigateToWinScreen: () -> Unit,
+    navigateToWinScreen: (elapsedMillis: Long) -> Unit,
     navigateBack: () -> Unit,
     gameViewModel: GameViewModel = hiltViewModel<GameViewModel, GameViewModel.Factory> { factory ->
         factory.create(boardSize = boardSize)
@@ -70,7 +70,7 @@ fun GameScreen(
     LaunchedEffect(Unit) {
         gameViewModel.uiEffect.collect {
             when (it) {
-                NavigateToWinScreen -> navigateToWinScreen()
+                is NavigateToWinScreen -> navigateToWinScreen(it.elapsedMillis)
             }
         }
     }

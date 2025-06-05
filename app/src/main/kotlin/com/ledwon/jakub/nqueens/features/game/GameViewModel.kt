@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import com.ledwon.jakub.nqueens.core.game.BoardPosition as CoreBoardPosition
@@ -49,7 +48,8 @@ class GameViewModel @AssistedInject constructor(
     val uiEffect = _uiEffect.asSharedFlow()
 
     private var gameEngine = gameEngineFactory.create(boardSize = boardSize)
-    private var gameFlowJob: Job? = null
+    private var timeFlow = stopwatch.start()
+    private var gameStateJob: Job? = null
     private var gameWonJob: Job? = null
 
     init {
@@ -61,9 +61,10 @@ class GameViewModel @AssistedInject constructor(
     }
 
     fun onRestartClick() {
-        gameFlowJob?.cancel()
+        gameStateJob?.cancel()
         gameWonJob?.cancel()
         gameEngine = gameEngineFactory.create(boardSize = boardSize)
+        timeFlow = stopwatch.start()
         observeGame()
     }
 
@@ -73,10 +74,10 @@ class GameViewModel @AssistedInject constructor(
     }
 
     private fun observeGameState() {
-        gameFlowJob = viewModelScope.launch {
+        gameStateJob = viewModelScope.launch {
             combine(
                 gameEngine.state,
-                stopwatch.start()
+                timeFlow
             ) { gameState, elapsedMillis ->
                 createState(gameState = gameState, elapsedMillis = elapsedMillis)
             }
@@ -87,13 +88,16 @@ class GameViewModel @AssistedInject constructor(
 
     private fun observeHasWon() {
         gameWonJob = viewModelScope.launch {
-            gameEngine.state
-                .map { it.hasWon }
-                .filter { it }
+            combine(
+                gameEngine.state,
+                timeFlow
+            ) { gameState, elapsedMillis ->
+                gameState.hasWon to elapsedMillis
+            }
+                .filter { (hasWon, _) -> hasWon }
                 .take(1)
-                .collect {
-                    _uiEffect.emit(NavigateToWinScreen)
-                    // TODO store current time and board size
+                .collect { (_, elapsedMillis) ->
+                    _uiEffect.emit(NavigateToWinScreen(elapsedMillis = elapsedMillis))
                 }
         }
     }
@@ -172,6 +176,6 @@ class GameViewModel @AssistedInject constructor(
         CoreBoardPosition(row = row, column = column)
 
     sealed interface UiEffect {
-        data object NavigateToWinScreen : UiEffect
+        data class NavigateToWinScreen(val elapsedMillis: Long) : UiEffect
     }
 }

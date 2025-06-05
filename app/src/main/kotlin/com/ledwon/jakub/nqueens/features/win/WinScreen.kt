@@ -1,6 +1,7 @@
 package com.ledwon.jakub.nqueens.features.win
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,8 +12,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,28 +24,33 @@ import com.ledwon.jakub.nqueens.ui.theme.NQueensTheme
 
 @Composable
 fun WinScreen(
+    elapsedMillis: Long,
     navigateToMainMenu: () -> Unit
 ) {
     WinScreenContent(
+        elapsedMillis = elapsedMillis,
         onMainMenuClick = navigateToMainMenu
     )
 }
 
 @Composable
 private fun WinScreenContent(
+    elapsedMillis: Long,
     onMainMenuClick: () -> Unit
 ) {
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { BottomBar(onMainMenuClick = onMainMenuClick) }
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
             YouWon()
+            YourTime(elapsedMillis = elapsedMillis)
         }
     }
 }
@@ -60,6 +68,29 @@ private fun YouWon() {
         text = stringResource(R.string.you_won),
         style = MaterialTheme.typography.headlineLarge,
         color = MaterialTheme.colorScheme.primary
+    )
+}
+
+@Composable
+private fun YourTime(elapsedMillis: Long) {
+    Text(
+        text = stringResource(R.string.your_time, formatMillis(elapsedMillis)),
+        style = MaterialTheme.typography.bodyLarge,
+    )
+}
+
+@ReadOnlyComposable
+@Composable
+private fun formatMillis(millis: Long): String {
+    val minutes = (millis / 1000) / 60
+    val seconds = (millis / 1000) % 60
+    val ms = millis % 1000
+    return String.format(
+        LocalConfiguration.current.locales[0],
+        "%02d:%02d.%03d",
+        minutes,
+        seconds,
+        ms
     )
 }
 
@@ -84,6 +115,7 @@ private fun BottomBar(
 private fun WinScreenPreview() {
     NQueensTheme {
         WinScreenContent(
+            elapsedMillis = 123456,
             onMainMenuClick = {}
         )
     }

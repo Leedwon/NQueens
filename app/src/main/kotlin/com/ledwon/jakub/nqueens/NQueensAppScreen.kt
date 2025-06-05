@@ -29,8 +29,8 @@ fun NQueensAppScreen() {
             val boardSize = it.toRoute<GameDestination>().boardSize
             GameScreen(
                 boardSize = boardSize,
-                navigateToWinScreen = {
-                    navController.navigate(WinDestination, navOptions = navOptions {
+                navigateToWinScreen = { elapsedMillis ->
+                    navController.navigate(WinDestination(elapsedMillis = elapsedMillis), navOptions = navOptions {
                         popUpTo(MainMenuDestination)
                     })
                 },
@@ -38,7 +38,9 @@ fun NQueensAppScreen() {
             )
         }
         composable<WinDestination> {
+            val elapsedMillis = it.toRoute<WinDestination>().elapsedMillis
             WinScreen(
+                elapsedMillis = elapsedMillis,
                 navigateToMainMenu = {
                     navController.popBackStack(route = MainMenuDestination, inclusive = false)
                 }

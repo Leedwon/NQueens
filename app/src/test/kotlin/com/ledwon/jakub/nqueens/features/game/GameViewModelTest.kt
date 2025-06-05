@@ -6,10 +6,10 @@ import com.ledwon.jakub.nqueens.core.corutines.CoroutineRule
 import com.ledwon.jakub.nqueens.core.game.GameEngine
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
 import com.ledwon.jakub.nqueens.core.stopwatch.FakeStopwatch
-import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect
 import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect.NavigateToWinScreen
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import kotlin.test.Test
@@ -323,7 +323,6 @@ class GameViewModelTest {
             assertThat(awaitItem()).isEqualTo(mutatedGameState)
 
             viewModel.onRestartClick()
-            stopwatch.valueFlow.value = 0L
 
             val initialGameState = GameState(
                 boardSize = boardSize,
@@ -348,12 +347,13 @@ class GameViewModelTest {
                 BoardPosition(0, 1),
                 BoardPosition(1, 3),
                 BoardPosition(2, 0),
-                BoardPosition(3, 2),
+                BoardPosition(3, 2)
             )
 
             winningPositions.forEach { viewModel.onCellClick(it) }
+            stopwatch.valueFlow.value = 123
 
-            assertThat(awaitItem()).isEqualTo(NavigateToWinScreen)
+            assertThat(awaitItem()).isEqualTo(NavigateToWinScreen(123))
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -362,6 +362,7 @@ class GameViewModelTest {
     @Test
     fun `navigates to win screen after restarting game`() = runTest(testDispatcher) {
         viewModel.uiEffect.test {
+            stopwatch.valueFlow.value = 123
             val winningPositions = listOf(
                 BoardPosition(0, 1),
                 BoardPosition(1, 3),
@@ -373,8 +374,9 @@ class GameViewModelTest {
             expectNoEvents()
 
             viewModel.onRestartClick()
+            stopwatch.valueFlow.value = 456
             winningPositions.forEach { viewModel.onCellClick(it) }
-            assertThat(awaitItem()).isEqualTo(NavigateToWinScreen)
+            assertThat(awaitItem()).isEqualTo(NavigateToWinScreen(456))
 
             cancelAndIgnoreRemainingEvents()
         }
