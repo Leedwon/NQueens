@@ -8,6 +8,7 @@ class FakeStopwatch : Stopwatch {
     var valueFlow = MutableStateFlow(0L)
 
     override fun start(): Flow<Long> {
+        valueFlow.value =0L
         return valueFlow
     }
 }
