@@ -6,6 +6,8 @@ import com.ledwon.jakub.nqueens.core.corutines.CoroutineRule
 import com.ledwon.jakub.nqueens.core.game.GameEngine
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
 import com.ledwon.jakub.nqueens.core.stopwatch.FakeStopwatch
+import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect
+import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect.NavigateToWinScreen
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -334,6 +336,45 @@ class GameViewModelTest {
                 elapsedMillis = 0
             )
             assertThat(awaitItem()).isEqualTo(initialGameState)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `navigates to win screen when game is won`() = runTest(testDispatcher) {
+        viewModel.uiEffect.test {
+            val winningPositions = listOf(
+                BoardPosition(0, 1),
+                BoardPosition(1, 3),
+                BoardPosition(2, 0),
+                BoardPosition(3, 2),
+            )
+
+            winningPositions.forEach { viewModel.onCellClick(it) }
+
+            assertThat(awaitItem()).isEqualTo(NavigateToWinScreen)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `navigates to win screen after restarting game`() = runTest(testDispatcher) {
+        viewModel.uiEffect.test {
+            val winningPositions = listOf(
+                BoardPosition(0, 1),
+                BoardPosition(1, 3),
+                BoardPosition(2, 0),
+                BoardPosition(3, 2),
+            )
+
+            winningPositions.take(3).forEach { viewModel.onCellClick(it) }
+            expectNoEvents()
+
+            viewModel.onRestartClick()
+            winningPositions.forEach { viewModel.onCellClick(it) }
+            assertThat(awaitItem()).isEqualTo(NavigateToWinScreen)
 
             cancelAndIgnoreRemainingEvents()
         }

@@ -7,6 +7,7 @@ import com.ledwon.jakub.nqueens.core.corutines.CoroutineDispatchers
 import com.ledwon.jakub.nqueens.core.game.Conflicts
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
 import com.ledwon.jakub.nqueens.core.stopwatch.Stopwatch
+import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect.NavigateToWinScreen
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -14,10 +15,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import com.ledwon.jakub.nqueens.core.game.BoardPosition as CoreBoardPosition
 import com.ledwon.jakub.nqueens.core.game.GameState as CoreGameState
@@ -39,11 +46,16 @@ class GameViewModel @AssistedInject constructor(
     private val _state = MutableStateFlow(createInitialState())
     val state = _state.asStateFlow()
 
+    private val _uiEffect = MutableSharedFlow<UiEffect>()
+    val uiEffect = _uiEffect.asSharedFlow()
+
     private var gameEngine = gameEngineFactory.create(boardSize = boardSize)
     private var gameFlowJob: Job? = null
+    private var gameWonJob: Job? = null
 
     init {
         observeGameFlow()
+        observeHasWon()
     }
 
     fun onCellClick(position: BoardPosition) {
@@ -52,8 +64,10 @@ class GameViewModel @AssistedInject constructor(
 
     fun onRestartClick() {
         gameFlowJob?.cancel()
+        gameWonJob?.cancel()
         gameEngine = gameEngineFactory.create(boardSize = boardSize)
         observeGameFlow()
+        observeHasWon()
     }
 
     private fun observeGameFlow() {
@@ -66,6 +80,16 @@ class GameViewModel @AssistedInject constructor(
             }
                 .flowOn(dispatchers.default)
                 .collect { _state.value = it }
+        }
+    }
+
+    private fun observeHasWon() {
+        gameWonJob = viewModelScope.launch {
+            gameEngine.state
+                .map { it.hasWon }
+                .filter { it }
+                .take(1)
+                .collect { _uiEffect.emit(NavigateToWinScreen) }
         }
     }
 
@@ -141,4 +165,8 @@ class GameViewModel @AssistedInject constructor(
 
     private fun BoardPosition.toCorePosition(): CoreBoardPosition =
         CoreBoardPosition(row = row, column = column)
+
+    sealed interface UiEffect {
+        data object NavigateToWinScreen: UiEffect
+    }
 }
