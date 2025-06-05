@@ -40,7 +40,7 @@ class GameViewModel @AssistedInject constructor(
     val state = _state.asStateFlow()
 
     private var gameEngine = gameEngineFactory.create(boardSize = boardSize)
-    private var gameSubscription: Job? = null
+    private var gameFlowJob: Job? = null
 
     init {
         observeGameFlow()
@@ -51,13 +51,13 @@ class GameViewModel @AssistedInject constructor(
     }
 
     fun onRestartClick() {
-        gameSubscription?.cancel()
+        gameFlowJob?.cancel()
         gameEngine = gameEngineFactory.create(boardSize = boardSize)
         observeGameFlow()
     }
 
     private fun observeGameFlow() {
-        gameSubscription = viewModelScope.launch {
+        gameFlowJob = viewModelScope.launch {
             combine(
                 gameEngine.state,
                 stopwatch.start()
