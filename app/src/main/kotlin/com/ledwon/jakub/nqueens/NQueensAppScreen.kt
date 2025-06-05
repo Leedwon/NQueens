@@ -24,7 +24,10 @@ fun NQueensAppScreen() {
         }
         composable<GameDestination> {
             val boardSize = it.toRoute<GameDestination>().boardSize
-            GameScreen(boardSize = boardSize)
+            GameScreen(
+                boardSize = boardSize,
+                navigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

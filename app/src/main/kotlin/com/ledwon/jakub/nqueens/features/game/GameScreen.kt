@@ -57,10 +57,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun GameScreen(
     boardSize: Int,
+    navigateBack: () -> Unit,
     gameViewModel: GameViewModel = hiltViewModel<GameViewModel, GameViewModel.Factory> { factory ->
         factory.create(boardSize = boardSize)
-    },
-
+    }
 ) {
     val state by gameViewModel.state.collectAsStateWithLifecycle()
 
@@ -68,7 +68,7 @@ fun GameScreen(
         state = state,
         onCellClick = { gameViewModel.onCellClick(it) },
         onRestartClick = { gameViewModel.onRestartClick() },
-        onBackClick = { TODO() }
+        onBackClick = navigateBack
     )
 }
 
