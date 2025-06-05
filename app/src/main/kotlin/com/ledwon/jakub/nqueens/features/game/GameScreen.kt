@@ -1,6 +1,5 @@
 package com.ledwon.jakub.nqueens.features.game
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -60,13 +59,11 @@ fun GameScreen(
     boardSize: Int,
     gameViewModel: GameViewModel = hiltViewModel<GameViewModel, GameViewModel.Factory> { factory ->
         factory.create(boardSize = boardSize)
-    }
+    },
+
 ) {
     val state by gameViewModel.state.collectAsStateWithLifecycle()
 
-    BackHandler {
-        // TODO handle back press
-    }
     GameContent(
         state = state,
         onCellClick = { gameViewModel.onCellClick(it) },
