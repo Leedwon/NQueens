@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ledwon.jakub.nqueens.R
+import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect.NavigateToWinScreen
 import com.ledwon.jakub.nqueens.ui.components.BoardCell
 import com.ledwon.jakub.nqueens.ui.components.BoardCellColors
 import com.ledwon.jakub.nqueens.ui.components.BoardCellDefaults
@@ -57,12 +59,21 @@ import kotlinx.coroutines.launch
 @Composable
 fun GameScreen(
     boardSize: Int,
+    navigateToWinScreen: () -> Unit,
     navigateBack: () -> Unit,
     gameViewModel: GameViewModel = hiltViewModel<GameViewModel, GameViewModel.Factory> { factory ->
         factory.create(boardSize = boardSize)
     }
 ) {
     val state by gameViewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        gameViewModel.uiEffect.collect {
+            when (it) {
+                NavigateToWinScreen -> navigateToWinScreen()
+            }
+        }
+    }
 
     GameContent(
         state = state,
