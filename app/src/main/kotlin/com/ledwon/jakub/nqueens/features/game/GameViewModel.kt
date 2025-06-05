@@ -91,7 +91,10 @@ class GameViewModel @AssistedInject constructor(
                 .map { it.hasWon }
                 .filter { it }
                 .take(1)
-                .collect { _uiEffect.emit(NavigateToWinScreen) }
+                .collect {
+                    _uiEffect.emit(NavigateToWinScreen)
+                    // TODO store current time and board size
+                }
         }
     }
 
