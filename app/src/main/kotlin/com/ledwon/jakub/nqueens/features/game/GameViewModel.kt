@@ -15,7 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -54,8 +53,7 @@ class GameViewModel @AssistedInject constructor(
     private var gameWonJob: Job? = null
 
     init {
-        observeGameFlow()
-        observeHasWon()
+        observeGame()
     }
 
     fun onCellClick(position: BoardPosition) {
@@ -66,11 +64,15 @@ class GameViewModel @AssistedInject constructor(
         gameFlowJob?.cancel()
         gameWonJob?.cancel()
         gameEngine = gameEngineFactory.create(boardSize = boardSize)
-        observeGameFlow()
+        observeGame()
+    }
+
+    private fun observeGame() {
+        observeGameState()
         observeHasWon()
     }
 
-    private fun observeGameFlow() {
+    private fun observeGameState() {
         gameFlowJob = viewModelScope.launch {
             combine(
                 gameEngine.state,
@@ -167,6 +169,6 @@ class GameViewModel @AssistedInject constructor(
         CoreBoardPosition(row = row, column = column)
 
     sealed interface UiEffect {
-        data object NavigateToWinScreen: UiEffect
+        data object NavigateToWinScreen : UiEffect
     }
 }
