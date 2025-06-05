@@ -9,6 +9,8 @@ import com.ledwon.jakub.nqueens.features.game.GameDestination
 import com.ledwon.jakub.nqueens.features.game.GameScreen
 import com.ledwon.jakub.nqueens.features.mainmenu.MainMenuDestination
 import com.ledwon.jakub.nqueens.features.mainmenu.MainMenuScreen
+import com.ledwon.jakub.nqueens.features.win.WinDestination
+import com.ledwon.jakub.nqueens.features.win.WinScreen
 
 @Composable
 fun NQueensAppScreen() {
@@ -27,6 +29,13 @@ fun NQueensAppScreen() {
             GameScreen(
                 boardSize = boardSize,
                 navigateBack = { navController.popBackStack() }
+            )
+        }
+        composable<WinDestination> {
+            WinScreen(
+                navigateToMainMenu = {
+                    navController.popBackStack(route = MainMenuDestination, inclusive = false)
+                }
             )
         }
     }

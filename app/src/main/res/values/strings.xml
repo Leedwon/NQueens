@@ -4,4 +4,7 @@
     <string name="board_size">Board size</string>
     <string name="board_size_template">%1$d x %1$d</string>
     <string name="play">Play</string>
+    <string name="congratulations">Congratulations</string>
+    <string name="you_won">You won!</string>
+    <string name="main_menu">Main menu</string>
 </resources>
