@@ -8,6 +8,7 @@ import com.ledwon.jakub.nqueens.core.game.Conflicts
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
 import com.ledwon.jakub.nqueens.core.stopwatch.Stopwatch
 import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect.NavigateToWinScreen
+import com.ledwon.jakub.nqueens.services.leaderboard.LeaderboardRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -32,6 +33,7 @@ import com.ledwon.jakub.nqueens.core.game.GameState as CoreGameState
 class GameViewModel @AssistedInject constructor(
     @Assisted private val boardSize: Int,
     private val gameEngineFactory: GameEngineFactory,
+    private val leaderboardRepository: LeaderboardRepository,
     private val stopwatch: Stopwatch,
     private val dispatchers: CoroutineDispatchers
 ) : ViewModel() {
@@ -97,6 +99,10 @@ class GameViewModel @AssistedInject constructor(
                 .filter { (hasWon, _) -> hasWon }
                 .take(1)
                 .collect { (_, elapsedMillis) ->
+                    leaderboardRepository.saveScore(
+                        boardSize = boardSize,
+                        elapsedMillis = elapsedMillis
+                    )
                     _uiEffect.emit(NavigateToWinScreen(elapsedMillis = elapsedMillis))
                 }
         }

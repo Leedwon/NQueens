@@ -7,6 +7,7 @@ import com.ledwon.jakub.nqueens.core.game.GameEngine
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
 import com.ledwon.jakub.nqueens.core.stopwatch.FakeStopwatch
 import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect.NavigateToWinScreen
+import com.ledwon.jakub.nqueens.services.leaderboard.FakeLeaderboardRepository
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runCurrent
@@ -34,11 +35,13 @@ class GameViewModelTest {
         }
     }
 
+    private val leaderboardRepository = FakeLeaderboardRepository()
     private val stopwatch = FakeStopwatch()
 
     private val viewModel = GameViewModel(
         boardSize = boardSize,
         gameEngineFactory = gameEngineFactory,
+        leaderboardRepository = leaderboardRepository,
         stopwatch = stopwatch,
         dispatchers = coroutineRule.testDispatchers
     )
@@ -373,6 +376,17 @@ class GameViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `saves score when game is won`() = runTest(testDispatcher) {
+        winningPositions.forEach { viewModel.onCellClick(it) }
+        stopwatch.valueFlow.value = 123
+        runCurrent()
+
+        assertThat(leaderboardRepository.lastSavedBoardSize).isEqualTo(boardSize)
+        assertThat(leaderboardRepository.lastSavedElapsedMillis).isEqualTo(123)
+    }
+
 
     private fun emptyCell() = Cell(
         hasQueen = false,
