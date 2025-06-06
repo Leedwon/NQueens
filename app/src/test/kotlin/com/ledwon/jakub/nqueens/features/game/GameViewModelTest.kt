@@ -22,6 +22,12 @@ class GameViewModelTest {
     private val coroutineRule = CoroutineRule(testDispatcher)
 
     private val boardSize = 4
+    private val winningPositions = listOf(
+        BoardPosition(0, 1),
+        BoardPosition(1, 3),
+        BoardPosition(2, 0),
+        BoardPosition(3, 2)
+    )
     private val gameEngineFactory = object : GameEngineFactory {
         override fun create(boardSize: Int): GameEngine {
             return GameEngine(boardSize = boardSize)
@@ -343,13 +349,6 @@ class GameViewModelTest {
     @Test
     fun `navigates to win screen when game is won`() = runTest(testDispatcher) {
         viewModel.uiEffect.test {
-            val winningPositions = listOf(
-                BoardPosition(0, 1),
-                BoardPosition(1, 3),
-                BoardPosition(2, 0),
-                BoardPosition(3, 2)
-            )
-
             winningPositions.forEach { viewModel.onCellClick(it) }
             stopwatch.valueFlow.value = 123
 
@@ -363,13 +362,6 @@ class GameViewModelTest {
     fun `navigates to win screen after restarting game`() = runTest(testDispatcher) {
         viewModel.uiEffect.test {
             stopwatch.valueFlow.value = 123
-            val winningPositions = listOf(
-                BoardPosition(0, 1),
-                BoardPosition(1, 3),
-                BoardPosition(2, 0),
-                BoardPosition(3, 2),
-            )
-
             winningPositions.take(3).forEach { viewModel.onCellClick(it) }
             expectNoEvents()
 
