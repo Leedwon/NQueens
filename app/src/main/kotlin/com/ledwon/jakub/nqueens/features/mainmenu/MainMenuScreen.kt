@@ -34,7 +34,8 @@ import com.ledwon.jakub.nqueens.ui.theme.NQueensTheme
 @Composable
 fun MainMenuScreen(
     viewModel: MainMenuViewModel = hiltViewModel(),
-    navigateToGame: (boardSize: Int) -> Unit
+    navigateToGame: (boardSize: Int) -> Unit,
+    navigateToLeaderboard: () -> Unit
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -50,7 +51,8 @@ fun MainMenuScreen(
     MainMenuContent(
         state = state,
         onBoardSizeChange = { viewModel.onBoardSizeChange(it) },
-        onPlayClick = { viewModel.onPlayClick() }
+        onPlayClick = { viewModel.onPlayClick() },
+        onOpenLeaderboardClick = navigateToLeaderboard
     )
 }
 
@@ -58,11 +60,17 @@ fun MainMenuScreen(
 private fun MainMenuContent(
     state: MainMenuState,
     onBoardSizeChange: (Int) -> Unit,
-    onPlayClick: () -> Unit
+    onPlayClick: () -> Unit,
+    onOpenLeaderboardClick: () -> Unit
 ) {
     Scaffold(
         topBar = { TopBar() },
-        bottomBar = { BottomBar(onPlayClick = onPlayClick) }
+        bottomBar = {
+            BottomBar(
+                onPlayClick = onPlayClick,
+                onOpenLeaderboardClick = onOpenLeaderboardClick
+            )
+        }
     ) {
         LazyColumn(modifier = Modifier.padding(it)) {
             item(key = "board_size_picker") {
@@ -143,19 +151,53 @@ private fun BoardPreview(boardSize: Int) {
 }
 
 @Composable
+private fun LeaderboardButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        modifier = modifier,
+        onClick = onClick,
+        content = {
+            Text(stringResource(R.string.leaderboards))
+        }
+    )
+}
+
+@Composable
+private fun PlayButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        modifier = modifier,
+        onClick = onClick,
+        content = {
+            Text(stringResource(R.string.play))
+        }
+    )
+}
+
+@Composable
 private fun BottomBar(
-    onPlayClick: () -> Unit
+    onPlayClick: () -> Unit,
+    onOpenLeaderboardClick: () -> Unit
 ) {
     BottomAppBar {
-        Button(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            onClick = onPlayClick,
-            content = {
-                Text(stringResource(R.string.play))
-            }
-        )
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            LeaderboardButton(onClick = onOpenLeaderboardClick)
+            PlayButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                onClick = onPlayClick
+            )
+        }
     }
 }
 
@@ -169,7 +211,8 @@ private fun MainMenuScreenPreview() {
         MainMenuContent(
             state = MainMenuState(boardSize = 8),
             onBoardSizeChange = {},
-            onPlayClick = {}
+            onPlayClick = {},
+            onOpenLeaderboardClick = {}
         )
     }
 }

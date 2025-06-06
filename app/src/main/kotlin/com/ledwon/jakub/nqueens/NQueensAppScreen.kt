@@ -8,6 +8,8 @@ import androidx.navigation.navOptions
 import androidx.navigation.toRoute
 import com.ledwon.jakub.nqueens.features.game.GameDestination
 import com.ledwon.jakub.nqueens.features.game.GameScreen
+import com.ledwon.jakub.nqueens.features.leaderboard.LeaderboardDestination
+import com.ledwon.jakub.nqueens.features.leaderboard.LeaderboardScreen
 import com.ledwon.jakub.nqueens.features.mainmenu.MainMenuDestination
 import com.ledwon.jakub.nqueens.features.mainmenu.MainMenuScreen
 import com.ledwon.jakub.nqueens.features.win.WinDestination
@@ -23,16 +25,21 @@ fun NQueensAppScreen() {
         startDestination = MainMenuDestination
     ) {
         composable<MainMenuDestination> {
-            MainMenuScreen(navigateToGame = { navController.navigate(GameDestination(boardSize = it)) })
+            MainMenuScreen(
+                navigateToGame = { navController.navigate(GameDestination(boardSize = it)) },
+                navigateToLeaderboard = { navController.navigate(LeaderboardDestination) }
+            )
         }
         composable<GameDestination> {
             val boardSize = it.toRoute<GameDestination>().boardSize
             GameScreen(
                 boardSize = boardSize,
                 navigateToWinScreen = { elapsedMillis ->
-                    navController.navigate(WinDestination(elapsedMillis = elapsedMillis), navOptions = navOptions {
-                        popUpTo(MainMenuDestination)
-                    })
+                    navController.navigate(
+                        WinDestination(elapsedMillis = elapsedMillis),
+                        navOptions = navOptions {
+                            popUpTo(MainMenuDestination)
+                        })
                 },
                 navigateBack = { navController.popBackStack() }
             )
@@ -45,6 +52,9 @@ fun NQueensAppScreen() {
                     navController.popBackStack(route = MainMenuDestination, inclusive = false)
                 }
             )
+        }
+        composable<LeaderboardDestination> {
+            LeaderboardScreen(navigateBack = { navController.popBackStack() })
         }
     }
 }
