@@ -165,6 +165,7 @@ private fun BoardSizePicker(
             onValueChange = {}
         )
         ExposedDropdownMenu(
+            modifier = Modifier.padding(horizontal = 16.dp),
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
