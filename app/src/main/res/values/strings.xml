@@ -8,4 +8,8 @@
     <string name="you_won">You won!</string>
     <string name="your_time">Your time %1$s</string>
     <string name="main_menu">Main menu</string>
+    <string name="leaderboards">Leaderboards</string>
+    <string name="leaderboard_place_template">#%1$d</string>
+    <string name="empty_leaderboard_title">No scores yet</string>
+    <string name="empty_leaderboard_message">Solve NQueens at least once to preview your scores</string>
 </resources>
