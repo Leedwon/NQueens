@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ledwon.jakub.nqueens.R
+import com.ledwon.jakub.nqueens.core.datetime.compose.formatMillis
 import com.ledwon.jakub.nqueens.ui.theme.NQueensTheme
 
 @Composable
@@ -76,21 +77,6 @@ private fun YourTime(elapsedMillis: Long) {
     Text(
         text = stringResource(R.string.your_time, formatMillis(elapsedMillis)),
         style = MaterialTheme.typography.bodyLarge,
-    )
-}
-
-@ReadOnlyComposable
-@Composable
-private fun formatMillis(millis: Long): String {
-    val minutes = (millis / 1000) / 60
-    val seconds = (millis / 1000) % 60
-    val ms = millis % 1000
-    return String.format(
-        LocalConfiguration.current.locales[0],
-        "%02d:%02d.%03d",
-        minutes,
-        seconds,
-        ms
     )
 }
 

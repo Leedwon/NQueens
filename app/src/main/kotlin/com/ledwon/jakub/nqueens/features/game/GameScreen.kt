@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ledwon.jakub.nqueens.R
+import com.ledwon.jakub.nqueens.core.datetime.compose.formatMillis
 import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect.NavigateToWinScreen
 import com.ledwon.jakub.nqueens.ui.components.BoardCell
 import com.ledwon.jakub.nqueens.ui.components.BoardCellColors
@@ -274,21 +275,6 @@ private fun getCellColors(cell: Cell): BoardCellColors {
     return BoardCellColors(
         whiteCellColor = whiteCellColor,
         blackCellColor = blackCellColor,
-    )
-}
-
-@ReadOnlyComposable
-@Composable
-private fun formatMillis(millis: Long): String {
-    val minutes = (millis / 1000) / 60
-    val seconds = (millis / 1000) % 60
-    val ms = millis % 1000
-    return String.format(
-        LocalConfiguration.current.locales[0],
-        "%02d:%02d.%03d",
-        minutes,
-        seconds,
-        ms
     )
 }
 
