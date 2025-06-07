@@ -40,6 +40,6 @@ class MainMenuTests : BaseTestCase() {
 
         robot.clickLeaderboardButton()
 
-        leaderboardRobot.assertTopBarIsDisplayed()
+        leaderboardRobot.assertTopBarTitleIsDisplayed()
     }
 }

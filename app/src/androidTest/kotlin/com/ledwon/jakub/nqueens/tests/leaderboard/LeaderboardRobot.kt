@@ -6,7 +6,8 @@ import androidx.compose.ui.test.onNodeWithText
 
 class LeaderboardRobot(private val rule: ComposeTestRule) {
 
-    fun assertTopBarIsDisplayed(): LeaderboardRobot = apply {
-        rule.onNodeWithText("Leaderboards").assertIsDisplayed()
+    fun assertTopBarTitleIsDisplayed(): LeaderboardRobot = apply {
+        rule.onNodeWithText("Leaderboards")
+            .assertIsDisplayed()
     }
 }
