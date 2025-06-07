@@ -159,7 +159,7 @@ private fun LeaderboardButton(
     modifier: Modifier = Modifier
 ) {
     Button(
-        modifier = modifier,
+        modifier = modifier.testTag(MainMenuTestTags.LEADERBOARD_BUTTON),
         onClick = onClick,
         content = {
             Text(stringResource(R.string.leaderboards))
@@ -173,7 +173,7 @@ private fun PlayButton(
     modifier: Modifier = Modifier
 ) {
     Button(
-        modifier = modifier,
+        modifier = modifier.testTag(MainMenuTestTags.PLAY_BUTTON),
         onClick = onClick,
         content = {
             Text(stringResource(R.string.play))

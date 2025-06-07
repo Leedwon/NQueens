@@ -1,6 +1,9 @@
 package com.ledwon.jakub.nqueens.tests.mainmenu
 
+import androidx.compose.ui.test.onNodeWithTag
 import com.ledwon.jakub.nqueens.BaseTestCase
+import com.ledwon.jakub.nqueens.tests.game.GameRobot
+import com.ledwon.jakub.nqueens.ui.components.ChessBoardTestTags
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Test
 
@@ -17,5 +20,17 @@ class MainMenuTests : BaseTestCase() {
             .assertBoardSize("4 x 4")
             .setBoardSize(8f)
             .assertBoardSize("8 x 8")
+    }
+
+    @Test
+    fun opensGame() {
+        val robot = MainMenuRobot(composeTestRule)
+        val gameRobot = GameRobot(composeTestRule)
+
+        robot
+            .setBoardSize(5f)
+            .clickPlayButton()
+
+        gameRobot.assertBoardSizeIs(5)
     }
 }

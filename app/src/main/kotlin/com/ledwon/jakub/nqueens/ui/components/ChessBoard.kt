@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +50,11 @@ fun ChessBoard(
             repeat(size) { row ->
                 Row(Modifier.fillMaxWidth()) {
                     repeat(size) { col ->
-                        Box(Modifier.size(cellSize)) {
+                        Box(
+                            Modifier
+                                .size(cellSize)
+                                .testTag(ChessBoardTestTags.createCellTag(row = row, column = col))
+                        ) {
                             ChessBoardScope(
                                 boardSize = size,
                                 row = row,
