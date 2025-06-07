@@ -1,9 +1,8 @@
 package com.ledwon.jakub.nqueens.tests.mainmenu
 
-import androidx.compose.ui.test.onNodeWithTag
 import com.ledwon.jakub.nqueens.BaseTestCase
 import com.ledwon.jakub.nqueens.tests.game.GameRobot
-import com.ledwon.jakub.nqueens.ui.components.ChessBoardTestTags
+import com.ledwon.jakub.nqueens.tests.leaderboard.LeaderboardRobot
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Test
 
@@ -32,5 +31,15 @@ class MainMenuTests : BaseTestCase() {
             .clickPlayButton()
 
         gameRobot.assertBoardSizeIs(5)
+    }
+
+    @Test
+    fun opensLeaderboard() {
+        val robot = MainMenuRobot(composeTestRule)
+        val leaderboardRobot = LeaderboardRobot(composeTestRule)
+
+        robot.clickLeaderboardButton()
+
+        leaderboardRobot.assertTopBarIsDisplayed()
     }
 }
