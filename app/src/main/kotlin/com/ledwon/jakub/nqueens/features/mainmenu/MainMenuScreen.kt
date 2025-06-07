@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -126,7 +127,8 @@ private fun BoardSizeSlider(
         value = value,
         onValueChange = onValueChange,
         valueRange = boardSizes,
-        steps = steps.toInt()
+        steps = steps.toInt(),
+        modifier = Modifier.testTag(MainMenuTestTags.BOARD_SIZE_SLIDER)
     )
 }
 
@@ -141,9 +143,10 @@ private fun BoardPreview(boardSize: Int) {
             modifier = Modifier
                 .size(animatedSize)
                 .border(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
-            size = boardSize.toInt()
+            size = boardSize
         )
         Text(
+            modifier = Modifier.testTag(MainMenuTestTags.BOARD_SIZE_TEXT),
             text = stringResource(R.string.board_size_template, boardSize),
             style = MaterialTheme.typography.bodyLarge
         )
