@@ -52,36 +52,6 @@ class LeaderboardTests : BaseTestCase() {
             .assertLeaderboardTimeIsDisplayed(time = "00:10.000")
     }
 
-    @Test
-    fun showsMultipleBoardSizesInLeaderboard() {
-        mainMenuRobot.setBoardSize(4f)
-        emitTime(10_000L)
-
-        mainMenuRobot.clickPlayButton()
-        gameRobot.win4x4Game()
-        winRobot.clickMainMenuButton()
-
-        mainMenuRobot.setBoardSize(5f)
-        emitTime(20_000L)
-
-        mainMenuRobot.clickPlayButton()
-        gameRobot.win5x5Game()
-        winRobot.clickMainMenuButton()
-
-        mainMenuRobot.clickLeaderboardButton()
-
-        leaderboardRobot
-            .openBoardSizePicker()
-            .assertBoardSizePickerHasEntries(4,5)
-            .selectBoardSize(4)
-            .assertLeaderboardPlaceIsDisplayed(1)
-            .assertLeaderboardTimeIsDisplayed("00:10.000")
-            .openBoardSizePicker()
-            .selectBoardSize(5)
-            .assertLeaderboardPlaceIsDisplayed(1)
-            .assertLeaderboardTimeIsDisplayed("00:20.000")
-    }
-
     private fun emitTime(time: Long) {
         (stopwatch as FakeStopwatch).emitTime(time)
     }

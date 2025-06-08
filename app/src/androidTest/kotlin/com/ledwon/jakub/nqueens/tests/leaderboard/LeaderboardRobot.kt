@@ -1,7 +1,6 @@
 package com.ledwon.jakub.nqueens.tests.leaderboard
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -27,9 +26,21 @@ class LeaderboardRobot(private val composeTestRule: ComposeTestRule) {
             .assertIsDisplayed()
     }
 
+    fun assertLeaderboardPlacesAreDisplayed(vararg places: Int): LeaderboardRobot = apply {
+        places.forEach { place ->
+            assertLeaderboardPlaceIsDisplayed(place)
+        }
+    }
+
     fun assertLeaderboardTimeIsDisplayed(time: String): LeaderboardRobot = apply {
         composeTestRule.onNodeWithText(time)
             .assertIsDisplayed()
+    }
+
+    fun assertLeaderboardTimesAreDisplayed(vararg times: String): LeaderboardRobot = apply {
+        times.forEach { time ->
+            assertLeaderboardTimeIsDisplayed(time)
+        }
     }
 
     fun assertBoardSizePickerHasEntries(vararg sizes: Int): LeaderboardRobot = apply {

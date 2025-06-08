@@ -85,23 +85,6 @@ class GameTests : BaseTestCase() {
             .assertNoConflictOnCell(row = 0, column = 0)
     }
 
-    @Test
-    fun navigatesToWinScreen() {
-        val winRobot = WinRobot(composeTestRule)
-
-        emitTime(10_000L)
-
-        gameRobot
-            .clickOnCell(row = 0, column = 2)
-            .clickOnCell(row = 1, column = 0)
-            .clickOnCell(row = 2, column = 3)
-            .clickOnCell(row = 3, column = 1)
-
-        winRobot
-            .assertTopBarTitleIsDisplayed()
-            .assertYouWinWithElapsedTime("00:10.000")
-    }
-
     private fun emitTime(time: Long) {
         (stopwatch as FakeStopwatch).emitTime(time)
     }

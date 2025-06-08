@@ -71,6 +71,17 @@ class GameRobot(private val rule: ComposeTestRule) {
         clickOnCell(4, 0)
     }
 
+    fun win8x8Game(): GameRobot = apply {
+        clickOnCell(0, 0)
+        clickOnCell(1, 4)
+        clickOnCell(2, 7)
+        clickOnCell(3, 5)
+        clickOnCell(4, 2)
+        clickOnCell(5, 6)
+        clickOnCell(6, 1)
+        clickOnCell(7, 3)
+    }
+
     private fun assertConflictOnCell(row: Int, column: Int, expected: Boolean): GameRobot = apply {
         rule.onNodeWithTag(ChessBoardTestTags.createCellTag(row, column), useUnmergedTree = true)
             .assert(
