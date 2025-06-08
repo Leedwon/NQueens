@@ -7,6 +7,7 @@ import com.ledwon.jakub.nqueens.features.game.GameTestTags.HasConflictKey
 object GameTestTags {
     const val QUEEN = "queen"
     const val ELAPSED_TIME = "elapsed_time"
+    const val RESTART_BUTTON = "restart_button"
     val HasConflictKey = SemanticsPropertyKey<Boolean>("hasConflict")
 
 }

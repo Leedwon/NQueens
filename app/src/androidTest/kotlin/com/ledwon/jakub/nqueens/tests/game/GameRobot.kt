@@ -51,6 +51,11 @@ class GameRobot(private val rule: ComposeTestRule) {
             .performClick()
     }
 
+    fun clickRestartButton(): GameRobot = apply {
+        rule.onNodeWithTag(GameTestTags.RESTART_BUTTON)
+            .performClick()
+    }
+
     private fun assertConflictOnCell(row: Int, column: Int, expected: Boolean): GameRobot = apply {
         rule.onNodeWithTag(ChessBoardTestTags.createCellTag(row, column), useUnmergedTree = true)
             .assert(

@@ -251,7 +251,7 @@ private fun RestartButton(
     val coroutineScope = rememberCoroutineScope()
 
     IconButton(
-        modifier = modifier,
+        modifier = modifier.testTag(GameTestTags.RESTART_BUTTON),
         onClick = {
             onClick()
             coroutineScope.launch {

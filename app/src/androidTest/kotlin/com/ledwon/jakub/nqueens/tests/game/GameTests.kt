@@ -71,6 +71,19 @@ class GameTests : BaseTestCase() {
         gameRobot.assertElapsedTime("02:00.000")
     }
 
+    @Test
+    fun restartsBoard() {
+        gameRobot
+            .clickOnCell(row = 0, column = 0)
+            .clickOnCell(row = 1, column = 1)
+            .clickOnCell(row = 2, column = 0)
+            .assertQueensCount(3)
+            .assertConflictOnCell(row = 0, column = 0)
+            .clickRestartButton()
+            .assertQueensCount(0)
+            .assertNoConflictOnCell(row = 0, column = 0)
+    }
+
     private fun emitTime(time: Long) {
         (stopwatch as FakeStopwatch).emitTime(time)
     }
