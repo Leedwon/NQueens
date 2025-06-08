@@ -56,6 +56,21 @@ class GameRobot(private val rule: ComposeTestRule) {
             .performClick()
     }
 
+    fun win4x4Game(): GameRobot = apply {
+        clickOnCell(0, 1)
+        clickOnCell(1, 3)
+        clickOnCell(2, 0)
+        clickOnCell(3, 2)
+    }
+
+    fun win5x5Game(): GameRobot = apply {
+        clickOnCell(0, 3)
+        clickOnCell(1, 1)
+        clickOnCell(2, 4)
+        clickOnCell(3, 2)
+        clickOnCell(4, 0)
+    }
+
     private fun assertConflictOnCell(row: Int, column: Int, expected: Boolean): GameRobot = apply {
         rule.onNodeWithTag(ChessBoardTestTags.createCellTag(row, column), useUnmergedTree = true)
             .assert(

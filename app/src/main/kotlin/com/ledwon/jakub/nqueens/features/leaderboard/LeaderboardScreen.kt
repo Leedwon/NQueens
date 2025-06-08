@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -156,7 +157,8 @@ private fun BoardSizePicker(
             modifier = Modifier
                 .menuAnchor(type = PrimaryNotEditable)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .testTag(LeaderboardTestTags.BOARD_SIZE_PICKER),
             value = selectedBoardSize?.let {
                 stringResource(R.string.board_size_template, selectedBoardSize)
             }.orEmpty(),
@@ -171,6 +173,9 @@ private fun BoardSizePicker(
         ) {
             boardSizes.forEach { boardSize ->
                 DropdownMenuItem(
+                    modifier = Modifier.testTag(
+                        LeaderboardTestTags.createBoardSizePickerItemTag(size = boardSize)
+                    ),
                     text = { Text(stringResource(R.string.board_size_template, boardSize)) },
                     onClick = {
                         onBoardSizeChange(boardSize)
@@ -199,10 +204,13 @@ private fun Leaderboard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    modifier = Modifier.sizeIn(minWidth = 32.dp),
+                    modifier = Modifier
+                        .sizeIn(minWidth = 32.dp),
                     text = stringResource(R.string.leaderboard_place_template, entry.place)
                 )
-                Text(formatMillis(entry.elapsedMillis))
+                Text(
+                    text = formatMillis(entry.elapsedMillis)
+                )
                 Text(getMedalEmoji(place = entry.place))
             }
         }
@@ -218,7 +226,10 @@ private fun TopBar(
         scrollBehavior = scrollBehavior,
         title = { Text(text = stringResource(R.string.leaderboards)) },
         navigationIcon = {
-            IconButton(onClick = onBackClick) {
+            IconButton(
+                modifier = Modifier.testTag(LeaderboardTestTags.BACK_BUTTON),
+                onClick = onBackClick
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null

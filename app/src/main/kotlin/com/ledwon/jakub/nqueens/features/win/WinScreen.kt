@@ -161,7 +161,8 @@ private fun BottomBar(
         Button(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .testTag(WinTestTags.MAIN_MENU_BUTTON),
             onClick = onMainMenuClick
         ) {
             Text(stringResource(R.string.main_menu))
