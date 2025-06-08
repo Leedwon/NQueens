@@ -85,6 +85,8 @@ class EndToEndTests : BaseTestCase() {
             .selectBoardSize(8)
             .assertLeaderboardPlacesAreDisplayed(1)
             .assertLeaderboardTimesAreDisplayed("00:10.000")
+
+        Thread.sleep(100) // Artificial delay as a hack for the leaderboard to update TODO replace with waitUntil or idling resources (but it was not working either for some reason)
     }
 
     private fun win4x4Game(elapsedTime: Long) {
