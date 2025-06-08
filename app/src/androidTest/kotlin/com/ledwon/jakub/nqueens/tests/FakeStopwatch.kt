@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Singleton
 
 class FakeStopwatch : Stopwatch {
 
@@ -30,6 +31,7 @@ class FakeStopwatch : Stopwatch {
 class FakeStopwatchModule {
 
     @Provides
+    @Singleton
     fun provideStopwatch(): Stopwatch {
         return FakeStopwatch()
     }

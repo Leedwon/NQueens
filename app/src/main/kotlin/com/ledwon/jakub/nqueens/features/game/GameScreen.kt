@@ -233,7 +233,9 @@ private fun ElapsedTime(millis: Long) {
         )
     ) {
         Text(
-            modifier = Modifier.padding(4.dp),
+            modifier = Modifier
+                .padding(4.dp)
+                .testTag(GameTestTags.ELAPSED_TIME),
             text = formatMillis(millis),
             style = MaterialTheme.typography.bodySmall
         )

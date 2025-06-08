@@ -3,6 +3,7 @@ package com.ledwon.jakub.nqueens.tests.game
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -38,6 +39,11 @@ class GameRobot(private val rule: ComposeTestRule) {
 
     fun assertNoConflictOnCell(row: Int, column: Int): GameRobot = apply {
         assertConflictOnCell(row = row, column = column, expected = false)
+    }
+
+    fun assertElapsedTime(expected: String): GameRobot = apply {
+        rule.onNodeWithTag(GameTestTags.ELAPSED_TIME)
+            .assertTextEquals(expected)
     }
 
     fun clickOnCell(row: Int, column: Int): GameRobot = apply {

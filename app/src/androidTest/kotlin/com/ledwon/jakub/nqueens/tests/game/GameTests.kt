@@ -1,6 +1,7 @@
 package com.ledwon.jakub.nqueens.tests.game
 
 import com.ledwon.jakub.nqueens.BaseTestCase
+import com.ledwon.jakub.nqueens.core.stopwatch.Stopwatch
 import com.ledwon.jakub.nqueens.tests.FakeStopwatch
 import com.ledwon.jakub.nqueens.tests.mainmenu.MainMenuRobot
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -12,6 +13,9 @@ import javax.inject.Inject
 class GameTests : BaseTestCase() {
 
     private lateinit var gameRobot: GameRobot
+
+    @Inject
+    lateinit var stopwatch: Stopwatch
     
     @Before
     override fun setUp() {
@@ -53,5 +57,21 @@ class GameTests : BaseTestCase() {
             .assertNoConflictOnCell(row = 1, column = 0)
             .assertNoConflictOnCell(row = 2, column = 0)
             .assertNoConflictOnCell(row = 3, column = 0)
+    }
+
+    @Test
+    fun updatesElapsedTime() {
+        emitTime(1_000L)
+        gameRobot.assertElapsedTime("00:01.000")
+
+        emitTime(5_000L)
+        gameRobot.assertElapsedTime("00:05.000")
+
+        emitTime(120_000L)
+        gameRobot.assertElapsedTime("02:00.000")
+    }
+
+    private fun emitTime(time: Long) {
+        (stopwatch as FakeStopwatch).emitTime(time)
     }
 }
