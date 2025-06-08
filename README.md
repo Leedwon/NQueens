@@ -33,7 +33,7 @@ To run UI tests (including E2E tests) from the terminal, use the following comma
 ./gradlew :app:connectedDebugAndroidTest
 ```
 
-Note: Ensure to turn off animations on your device without this, UI tests may fail due to timing
+⚠️ Note: Ensure to turn off animations on your device without this, UI tests may fail due to timing
 issues. You can do this by enabling "Developer options" and setting "Window animation scale", "
 Transition animation scale", and "Animator duration scale" to "Animation off".
 
@@ -72,10 +72,8 @@ The app follows a comprehensive testing strategy with a testing pyramid approach
 
 - **Unit tests**: Testing individual components in isolation. Most components are covered by unit
   tests to ensure their correctness.
--
 - **UI tests**: Testing the integration between UI and logic. UI tests are added for each screen (
   game, leaderboard, main menu, win) to ensure proper UI behavior and integration.
-
 - **E2E tests**: Part of UI tests that test the whole game flow from start to finish, ensuring that
   all components work together correctly.
 
@@ -223,7 +221,7 @@ The N-Queens app maintains a local leaderboard where multiple completion times a
 size (4x4 to 12x12).
 The leaderboard UI expects a structure like:
 
-```Kotlin
+```kotlin
 data class Leaderboard(
     val boardSize: Int,
     val elapsedMillis: List<Long>
