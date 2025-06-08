@@ -34,12 +34,14 @@ class GameViewModelTest {
             return GameEngine(boardSize = boardSize)
         }
     }
+    private val gameStateFactory = GameStateFactory()
 
     private val leaderboardRepository = FakeLeaderboardRepository()
     private val stopwatch = FakeStopwatch()
 
     private val viewModel = GameViewModel(
         boardSize = boardSize,
+        gameStateFactory = gameStateFactory,
         gameEngineFactory = gameEngineFactory,
         leaderboardRepository = leaderboardRepository,
         stopwatch = stopwatch,
@@ -98,197 +100,6 @@ class GameViewModelTest {
             assertThat(awaitItem().cells).isEqualTo(emptyCells())
 
             cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `creates cells with row conflict`() = runTest(testDispatcher) {
-        viewModel.state.test {
-            awaitItem() // Initial state
-
-            viewModel.onCellClick(BoardPosition(row = 0, column = 0))
-            viewModel.onCellClick(BoardPosition(row = 0, column = 1))
-
-            val expectedCells = emptyCells()
-                .apply {
-                    set(
-                        BoardPosition(row = 0, column = 0),
-                        Cell(hasQueen = true, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 0, column = 1),
-                        Cell(hasQueen = true, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 0, column = 2),
-                        Cell(hasQueen = false, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 0, column = 3),
-                        Cell(hasQueen = false, hasConflict = true)
-                    )
-                }
-                .toPersistentMap()
-
-            assertThat(awaitItem().cells).isEqualTo(expectedCells)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `creates cells with column conflict`() = runTest(testDispatcher) {
-        viewModel.state.test {
-            awaitItem() // Initial state
-
-            viewModel.onCellClick(BoardPosition(row = 0, column = 0))
-            viewModel.onCellClick(BoardPosition(row = 1, column = 0))
-
-            val expectedCells = emptyCells()
-                .apply {
-                    set(
-                        BoardPosition(row = 0, column = 0),
-                        Cell(hasQueen = true, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 1, column = 0),
-                        Cell(hasQueen = true, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 2, column = 0),
-                        Cell(hasQueen = false, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 3, column = 0),
-                        Cell(hasQueen = false, hasConflict = true)
-                    )
-                }
-                .toPersistentMap()
-
-            assertThat(awaitItem().cells).isEqualTo(expectedCells)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `creates cells with major diagonal conflict`() = runTest(testDispatcher) {
-        viewModel.state.test {
-            awaitItem() // Initial state
-
-            viewModel.onCellClick(BoardPosition(row = 0, column = 0))
-            viewModel.onCellClick(BoardPosition(row = 1, column = 1))
-
-            val expectedCells = emptyCells()
-                .apply {
-                    set(
-                        BoardPosition(row = 0, column = 0),
-                        Cell(hasQueen = true, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 1, column = 1),
-                        Cell(hasQueen = true, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 2, column = 2),
-                        Cell(hasQueen = false, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 3, column = 3),
-                        Cell(hasQueen = false, hasConflict = true)
-                    )
-                }
-                .toPersistentMap()
-
-            assertThat(awaitItem().cells).isEqualTo(expectedCells)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `creates cells with minor diagonal conflict`() = runTest(testDispatcher) {
-        viewModel.state.test {
-            awaitItem() // Initial state
-
-            viewModel.onCellClick(BoardPosition(row = 0, column = 3))
-            viewModel.onCellClick(BoardPosition(row = 1, column = 2))
-
-            val expectedCells = emptyCells()
-                .apply {
-                    set(
-                        BoardPosition(row = 0, column = 3),
-                        Cell(hasQueen = true, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 1, column = 2),
-                        Cell(hasQueen = true, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 2, column = 1),
-                        Cell(hasQueen = false, hasConflict = true)
-                    )
-                    set(
-                        BoardPosition(row = 3, column = 0),
-                        Cell(hasQueen = false, hasConflict = true)
-                    )
-                }
-                .toPersistentMap()
-
-            assertThat(awaitItem().cells).isEqualTo(expectedCells)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `creates cells with no conflicts when queens are placed correctly`() =
-        runTest(testDispatcher) {
-            viewModel.state.test {
-                awaitItem() // Initial state
-
-                val positions = listOf(
-                    BoardPosition(0, 1),
-                    BoardPosition(1, 3),
-                    BoardPosition(2, 0),
-                    BoardPosition(3, 2)
-                )
-
-                positions.forEach { viewModel.onCellClick(it) }
-
-                val expectedCells = emptyCells()
-                    .apply {
-                        positions.forEach { set(it, Cell(hasQueen = true, hasConflict = false)) }
-                    }
-                    .toPersistentMap()
-
-                assertThat(awaitItem().cells).isEqualTo(expectedCells)
-
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `creates queens metadata`() = runTest(testDispatcher) {
-        viewModel.state.test {
-            awaitItem() // Initial state
-
-            val positions = listOf(
-                BoardPosition(0, 1),
-                BoardPosition(1, 2),
-                BoardPosition(2, 0),
-                BoardPosition(3, 2)
-            )
-
-            positions.forEach { viewModel.onCellClick(it) }
-
-            val expected = QueensMetadata(
-                goal = boardSize,
-                correctlyPlaced = 1,
-                conflicting = 3
-            )
-
-            assertThat(awaitItem().queensMetadata).isEqualTo(expected)
         }
     }
 

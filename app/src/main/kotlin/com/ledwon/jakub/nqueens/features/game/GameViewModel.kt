@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ledwon.jakub.nqueens.core.corutines.CoroutineDispatchers
-import com.ledwon.jakub.nqueens.core.game.Conflicts
 import com.ledwon.jakub.nqueens.core.game.GameEngineFactory
 import com.ledwon.jakub.nqueens.core.stopwatch.Stopwatch
 import com.ledwon.jakub.nqueens.features.game.GameViewModel.UiEffect.NavigateToWinScreen
@@ -26,13 +25,13 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import com.ledwon.jakub.nqueens.core.game.BoardPosition as CoreBoardPosition
-import com.ledwon.jakub.nqueens.core.game.GameState as CoreGameState
 
 @Stable
 @HiltViewModel(assistedFactory = GameViewModel.Factory::class)
 class GameViewModel @AssistedInject constructor(
     @Assisted private val boardSize: Int,
     private val gameEngineFactory: GameEngineFactory,
+    private val gameStateFactory: GameStateFactory,
     private val leaderboardRepository: LeaderboardRepository,
     private val stopwatch: Stopwatch,
     private val dispatchers: CoroutineDispatchers
@@ -81,7 +80,11 @@ class GameViewModel @AssistedInject constructor(
                 gameEngine.state,
                 timeFlow
             ) { gameState, elapsedMillis ->
-                createState(gameState = gameState, elapsedMillis = elapsedMillis)
+                gameStateFactory.createState(
+                    boardSize = boardSize,
+                    gameState = gameState,
+                    elapsedMillis = elapsedMillis
+                )
             }
                 .flowOn(dispatchers.default)
                 .collect { _state.value = it }
@@ -108,64 +111,10 @@ class GameViewModel @AssistedInject constructor(
         }
     }
 
-    private fun createState(gameState: CoreGameState, elapsedMillis: Long): GameState {
-        return GameState(
-            boardSize = boardSize,
-            cells = createCells(
-                queens = gameState.queens,
-                conflicts = gameState.conflicts
-            ),
-            queensMetadata = createQueensMetadata(
-                queens = gameState.queens,
-                conflicts = gameState.conflicts
-            ),
-            elapsedMillis = elapsedMillis
-        )
-    }
-
-    private fun createCells(
-        queens: Set<CoreBoardPosition>,
-        conflicts: Conflicts
-    ): ImmutableMap<BoardPosition, Cell> {
-        return (0 until boardSize).flatMap { row ->
-            (0 until boardSize).map { column ->
-                val position = CoreBoardPosition(row, column)
-                val cell = Cell(
-                    hasQueen = position in queens,
-                    hasConflict = position in conflicts
-                )
-                position.toUiPosition() to cell
-            }
-        }
-            .toMap()
-            .toPersistentMap()
-    }
-
-    private fun createQueensMetadata(
-        queens: Set<CoreBoardPosition>,
-        conflicts: Conflicts
-    ): QueensMetadata {
-        val correctlyPlaced = queens.count { it !in conflicts }
-        val conflicting = queens.size - correctlyPlaced
-        return QueensMetadata(
-            goal = boardSize,
-            correctlyPlaced = correctlyPlaced,
-            conflicting = conflicting
-        )
-    }
-
     private fun createInitialState(): GameState {
         return GameState(
             boardSize = boardSize,
-            cells = createCells(
-                queens = emptySet(),
-                conflicts = Conflicts(
-                    rows = emptySet(),
-                    columns = emptySet(),
-                    majorDiagonals = emptySet(),
-                    minorDiagonals = emptySet()
-                )
-            ),
+            cells = createEmptyCells(),
             queensMetadata = QueensMetadata(
                 goal = boardSize,
                 correctlyPlaced = 0,
@@ -175,8 +124,20 @@ class GameViewModel @AssistedInject constructor(
         )
     }
 
-    private fun CoreBoardPosition.toUiPosition(): BoardPosition =
-        BoardPosition(row = row, column = column)
+    private fun createEmptyCells(
+    ): ImmutableMap<BoardPosition, Cell> {
+        return (0 until boardSize).flatMap { row ->
+            (0 until boardSize).map { column ->
+                val cell = Cell(
+                    hasQueen = false,
+                    hasConflict = false
+                )
+                BoardPosition(row = row, column = column) to cell
+            }
+        }
+            .toMap()
+            .toPersistentMap()
+    }
 
     private fun BoardPosition.toCorePosition(): CoreBoardPosition =
         CoreBoardPosition(row = row, column = column)
