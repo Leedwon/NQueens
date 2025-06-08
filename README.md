@@ -5,6 +5,12 @@ board (from 4×4 up to 12×12).
 The app offers real-time conflict validation, smooth animations, and a local leaderboard to track
 best completion times per board size.
 
+## Demo
+
+Here's a quick demo of the app in action:
+
+![NQueens Demo](/assets/demo.mp4)
+
 ## Running the app
 
 To run the app from the terminal, use the following command:
