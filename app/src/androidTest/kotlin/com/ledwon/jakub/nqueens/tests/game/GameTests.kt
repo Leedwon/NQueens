@@ -4,6 +4,7 @@ import com.ledwon.jakub.nqueens.BaseTestCase
 import com.ledwon.jakub.nqueens.core.stopwatch.Stopwatch
 import com.ledwon.jakub.nqueens.tests.FakeStopwatch
 import com.ledwon.jakub.nqueens.tests.mainmenu.MainMenuRobot
+import com.ledwon.jakub.nqueens.tests.win.WinRobot
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
 import org.junit.Test
@@ -82,6 +83,23 @@ class GameTests : BaseTestCase() {
             .clickRestartButton()
             .assertQueensCount(0)
             .assertNoConflictOnCell(row = 0, column = 0)
+    }
+
+    @Test
+    fun navigatesToWinScreen() {
+        val winRobot = WinRobot(composeTestRule)
+
+        emitTime(10_000L)
+
+        gameRobot
+            .clickOnCell(row = 0, column = 2)
+            .clickOnCell(row = 1, column = 0)
+            .clickOnCell(row = 2, column = 3)
+            .clickOnCell(row = 3, column = 1)
+
+        winRobot
+            .assertTopBarTitleIsDisplayed()
+            .assertYouWinWithElapsedTime("00:10.000")
     }
 
     private fun emitTime(time: Long) {
