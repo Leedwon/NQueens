@@ -249,8 +249,8 @@ below.
 
 We selected the sorted SQL + Kotlin grouping approach:
 
-🧠 Rationale
+🧠 Rationale:
 
--SQL handles sorting efficiently, Kotlin handles grouping clearly.
--Avoids string manipulation and parsing entirely.
--Plays well with Room
+- SQL handles sorting efficiently, Kotlin handles grouping clearly.
+- Avoids string manipulation and parsing entirely.
+- Plays well with Room
