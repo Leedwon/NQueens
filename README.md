@@ -7,9 +7,7 @@ best completion times per board size.
 
 ## Demo
 
-Here's a quick demo of the app in action:
-
-![NQueens Demo](/assets/demo.mp4)
+A quick demo of an app in action can be found in [assets/demo.mp4](/assets/demo.mp4).
 
 ## Running the app
 
