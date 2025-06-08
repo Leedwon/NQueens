@@ -162,9 +162,9 @@ class GameViewModelTest {
 
     @Test
     fun `navigates to win screen when game is won`() = runTest(testDispatcher) {
+        stopwatch.valueFlow.value = 123
         viewModel.uiEffect.test {
             winningPositions.forEach { viewModel.onCellClick(it) }
-            stopwatch.valueFlow.value = 123
 
             assertThat(awaitItem()).isEqualTo(NavigateToWinScreen(123))
 
@@ -190,8 +190,8 @@ class GameViewModelTest {
 
     @Test
     fun `saves score when game is won`() = runTest(testDispatcher) {
-        winningPositions.forEach { viewModel.onCellClick(it) }
         stopwatch.valueFlow.value = 123
+        winningPositions.forEach { viewModel.onCellClick(it) }
         runCurrent()
 
         assertThat(leaderboardRepository.lastSavedBoardSize).isEqualTo(boardSize)
