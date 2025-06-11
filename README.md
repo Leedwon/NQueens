@@ -161,7 +161,7 @@ We need to choose an algorithm for detecting conflicts among the currently place
 | Approach                | Description                                                                     | Complexity                        | Notes                                                                                                                              |
 |-------------------------|---------------------------------------------------------------------------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
 | **Pairwise comparison** | Compare every pair of queens to check for conflict conditions.                  | O(q²), where q = number of queens | ✅ Simple to implement.<br>❌ May redundantly detect the same conflict multiple times.<br>❌ Slightly verbose for highlighting logic. |
-| **Line-based counting** | Use hash maps to count how many queens exist in each row, column, and diagonal. | O(q + N), where N = board size    | ✅ More performant.<br>✅ Matches well with structured line-based conflict representation.                                           |
+| **Line-based counting** | Use hash maps to count how many queens exist in each row, column, and diagonal. | O(1)                              | ✅ More performant.<br>✅ Matches well with structured line-based conflict representation.                                           |
 
 ---
 
@@ -247,7 +247,7 @@ below.
 |---------------------------------------|------------------------------------------------------------------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------|
 | `GROUP_CONCAT` in SQL                 | Use SQL to return a comma-separated list of times for each board size. | ✅ Fewer rows<br>✅ Compact result<br>✅ Feels natural from SQL perspective | ❌ Requires string parsing<br>❌ Loses type safety<br>❌ Awkward with Room |
 | `SELECT *` and group + sort in Kotlin | Fetch all rows and group/sort them in Kotlin after retrieval.          | ✅ Full control<br>✅ Type-safe<br>✅ Simple Room query                     | ❌ Slightly more memory use<br>❌ All rows must be loaded at once         |
-| `SELECT * ORDER BY` + group in Kotlin | Use SQL for sorting, then group by boardSize in Kotlin.                | ✅ Clean separation of concerns<br>✅ Type-safe<br>✅ Efficient sort        | ❌ Relies on predictable sorting from SQL                                |
+| `SELECT * ORDER BY` + group in Kotlin | Use SQL for sorting, then group by boardSize in Kotlin.                | ✅ Clean separation of concerns<br>✅ Type-safe<br>✅ Efficient sort        | ❌ Logic mixed between SQL and Kotlin                                    |
 
 ### ✅ Decision
 
